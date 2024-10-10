@@ -23,15 +23,19 @@ const LoginSchema = Yup.object().shape({
 const LoginScreen = () => {
   const [role, setRole] = useState("passenger"); // Por defecto 'passenger'
 
-  const handleLogin = (values) => {
-    axios
-      .post("http://tuapi.com/login", { ...values, role })
-      .then((response) => {
-        console.log("Connexion réussie:", response.data);
-      })
-      .catch((error) => {
-        console.log("Erreur lors de la connexion:", error);
-      });
+  const handleLogin = async (values) => {
+    try {
+      const response = await axios.post(
+        "http://192.168.2.20:3000/api/users/login",
+        {
+          ...values,
+          role,
+        }
+      );
+      console.log("Connexion réussie:", response.data);
+    } catch (error) {
+      console.log("Erreur lors de la connexion:", error);
+    }
   };
 
   return (

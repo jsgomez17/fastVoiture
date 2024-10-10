@@ -14,44 +14,36 @@ import axios from "axios";
 
 // Esquema de validación de Yup
 const SignupSchema = Yup.object().shape({
-  email: Yup.string().email("E-mail invalide").required("Requerido"),
+  nom: Yup.string().required("Requerido"),
+  prenom: Yup.string().required("Requerido"),
+  telephone: Yup.string()
+    .required("Requerido")
+    .matches(/^\d{10}$/, "Debe contener 10 dígitos"),
+  email: Yup.string().email("E-mail invalido").required("Requerido"),
   password: Yup.string()
-    .min(6, "Doit contenir au moins 6 caractères")
+    .min(6, "Debe tener al menos 6 caracteres")
     .required("Requerido"),
-  nom: Yup.string().when("role", {
-    is: "passenger",
-    then: Yup.string().required("Requerido"),
-  }),
-  prenom: Yup.string().when("role", {
-    is: "passenger",
-    then: Yup.string().required("Requerido"),
-  }),
-  telephone: Yup.string().when("role", {
-    is: "passenger",
-    then: Yup.string()
-      .required("Requerido")
-      .matches(/^\d{10}$/, "Doit contenir 10 chiffres"),
-  }),
   confirmPassword: Yup.string()
-    .oneOf(
-      [Yup.ref("password"), null],
-      "Les mots de passe ne correspondent pas"
-    )
+    .oneOf([Yup.ref("password"), null], "Las contraseñas no coinciden")
     .required("Requerido"),
 });
 
 const SignupScreen = () => {
   const [role, setRole] = useState("passenger"); // Por defecto es 'passenger'
 
-  const handleSignup = (values) => {
-    axios
-      .post("http://tuapi.com/signup", { ...values, role })
-      .then((response) => {
-        console.log("Utilisateur créé:", response.data);
-      })
-      .catch((error) => {
-        console.log("Erreur lors de la création de l'utilisateur:", error);
-      });
+  const handleSignup = async (values) => {
+    try {
+      const response = await axios.post(
+        "http://192.168.2.20:3000/api/users/register",
+        {
+          ...values,
+          role,
+        }
+      );
+      console.log("Utilisateur créé:", response.data);
+    } catch (error) {
+      console.log("Erreur lors de la création de l'utilisateur:", error);
+    }
   };
 
   return (
