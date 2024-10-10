@@ -39,15 +39,30 @@ router.post("/register", async (req, res) => {
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
-  const user = await User.findOne({ email });
-  if (!user) return res.status(400).json({ message: "Usuario no encontrado" });
+  try {
+    // Buscar el usuario por correo
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res
+        .status(404)
+        .json({
+          message: "L'utilisateur n'existe pas, veuillez vous inscrire.",
+        });
+    }
 
-  const validPassword = await bcrypt.compare(password, user.password);
-  if (!validPassword)
-    return res.status(400).json({ message: "Contraseña incorrecta" });
+    // Verificar la contraseña
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res
+        .status(400)
+        .json({ message: "Email ou mot de passe incorrect" });
+    }
 
-  const token = jwt.sign({ id: user._id }, "secret_key", { expiresIn: "1h" });
-  res.json({ token });
+    // Aquí puedes generar un token JWT y enviarlo como respuesta
+    res.status(200).json({ message: "Connexion réussie", user });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 });
 
 module.exports = router;

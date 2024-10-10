@@ -11,8 +11,10 @@ const mongoURI =
 // Conectar a la base de datos MongoDB
 mongoose
   .connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log("Base de datos conectada a MongoDB Atlas"))
-  .catch((err) => console.error("Error al conectar a la base de datos", err));
+  .then(() => console.log("Base de données connectée à MongoDB Atlas"))
+  .catch((err) =>
+    console.error("Erreur de connexion à la base de données", err)
+  );
 
 // Usar las rutas de usuario
 app.use("/api/users", userRoutes); // Prefijo para las rutas de usuario
@@ -20,5 +22,5 @@ app.use("/api/users", userRoutes); // Prefijo para las rutas de usuario
 // Iniciar el Servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Servidor en funcionamiento en el puerto ${PORT}`);
+  console.log(`Serveur exécuté dans le port ${PORT}`);
 });

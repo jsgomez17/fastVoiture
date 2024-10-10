@@ -7,6 +7,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
+  Alert,
 } from "react-native";
 import { Formik } from "formik";
 import * as Yup from "yup";
@@ -14,13 +15,13 @@ import axios from "axios";
 
 // Esquema de validación de Yup para el formulario de login
 const LoginSchema = Yup.object().shape({
-  email: Yup.string().email("E-mail invalide").required("Requerido"),
+  email: Yup.string().email("Email invalide").required("L'email est requis"),
   password: Yup.string()
     .min(6, "Doit contenir au moins 6 caractères")
-    .required("Requerido"),
+    .required("Un mot de passe est requis"),
 });
 
-const LoginScreen = () => {
+const LoginScreen = ({ navigation }) => {
   const [role, setRole] = useState("passenger"); // Por defecto 'passenger'
 
   const handleLogin = async (values) => {
@@ -28,13 +29,30 @@ const LoginScreen = () => {
       const response = await axios.post(
         "http://192.168.2.20:3000/api/users/login",
         {
-          ...values,
+          email: values.email,
+          password: values.password,
           role,
         }
       );
       console.log("Connexion réussie:", response.data);
+
+      // Aquí redirigimos a la pantalla de reserva
+      navigation.navigate("Reservation");
     } catch (error) {
       console.log("Erreur lors de la connexion:", error);
+      // Manejo de errores específicos
+      if (error.response) {
+        if (error.response.status === 404) {
+          Alert.alert(
+            "Erreur",
+            "L'utilisateur n'existe pas, veuillez vous inscrire."
+          );
+        } else {
+          Alert.alert("Erreur", error.response.data.message);
+        }
+      } else {
+        Alert.alert("Erreur", "Échec de la connexion");
+      }
     }
   };
 
@@ -43,10 +61,9 @@ const LoginScreen = () => {
       initialValues={{
         email: "",
         password: "",
-        role: "passenger",
       }}
       validationSchema={LoginSchema}
-      onSubmit={(values) => handleLogin(values)}
+      onSubmit={handleLogin}
     >
       {({ handleChange, handleBlur, handleSubmit, values, errors }) => (
         <View style={styles.container}>
@@ -108,6 +125,13 @@ const LoginScreen = () => {
           )}
 
           <Button onPress={handleSubmit} title="Se connecter" />
+
+          {/* Enlace a la página de inscripción */}
+          <TouchableOpacity onPress={() => navigation.navigate("SignupScreen")}>
+            <Text style={styles.loginText}>
+              Vous n'avez pas de compte ? S'inscrire
+            </Text>
+          </TouchableOpacity>
         </View>
       )}
     </Formik>
@@ -160,6 +184,11 @@ const styles = StyleSheet.create({
   },
   error: {
     color: "red",
+  },
+  loginText: {
+    marginTop: 20,
+    color: "blue",
+    textAlign: "center",
   },
 });
 

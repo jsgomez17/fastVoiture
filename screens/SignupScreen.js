@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Image,
   Alert,
+  ScrollView, // Importamos ScrollView
 } from "react-native";
 import { Formik } from "formik";
 import * as Yup from "yup";
@@ -15,18 +16,21 @@ import axios from "axios";
 
 // Esquema de validación de Yup
 const SignupSchema = Yup.object().shape({
-  nom: Yup.string().required("Requerido"),
-  prenom: Yup.string().required("Requerido"),
+  nom: Yup.string().required("Le nom est requis"),
+  prenom: Yup.string().required("Le prenom est requis"),
   telephone: Yup.string()
-    .required("Requerido")
-    .matches(/^\d{10}$/, "Debe contener 10 dígitos"),
-  email: Yup.string().email("E-mail invalido").required("Requerido"),
+    .required("Le telephone est requis")
+    .matches(/^\d{10}$/, "Doit contenir 10 chiffress"),
+  email: Yup.string().email("Email invalide").required("L'email est requis"),
   password: Yup.string()
-    .min(6, "Debe tener al menos 6 caracteres")
-    .required("Requerido"),
+    .min(6, "Doit contenir au moins 6 caractères")
+    .required("Un mot de passe est requis"),
   confirmPassword: Yup.string()
-    .oneOf([Yup.ref("password"), null], "Las contraseñas no coinciden")
-    .required("Requerido"),
+    .oneOf(
+      [Yup.ref("password"), null],
+      "Les mots de passe ne correspondent pas"
+    )
+    .required("Un mot de passe est requis"),
 });
 
 const SignupScreen = ({ navigation }) => {
@@ -72,135 +76,137 @@ const SignupScreen = ({ navigation }) => {
       validationSchema={SignupSchema}
       onSubmit={handleSignup} // Se pasa directamente el manejador de envío
     >
-      {({
-        handleChange,
-        handleBlur,
-        handleSubmit,
-        values,
-        errors,
-        resetForm,
-      }) => (
-        <View style={styles.container}>
-          <View style={styles.headerContainer}>
-            <Image
-              source={require("../assets/logoFastVoiture.png")}
-              style={styles.logo}
+      {({ handleChange, handleBlur, handleSubmit, values, errors }) => (
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          <View style={styles.container}>
+            <View style={styles.headerContainer}>
+              <Image
+                source={require("../assets/logoFastVoiture.png")}
+                style={styles.logo}
+              />
+              <Text style={styles.title}>Inscripción</Text>
+            </View>
+
+            {/* Radio Button para Pasajero o Conductor */}
+            <View style={styles.radioContainer}>
+              <TouchableOpacity
+                onPress={() => setRole("passenger")}
+                style={styles.radioButton}
+              >
+                <Text
+                  style={
+                    role === "passenger" ? styles.radioSelected : styles.radio
+                  }
+                >
+                  Passager
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => setRole("driver")}
+                style={styles.radioButton}
+              >
+                <Text
+                  style={
+                    role === "driver" ? styles.radioSelected : styles.radio
+                  }
+                >
+                  Conducteur
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Formulario adicional si es 'passager' */}
+            {role === "passenger" && (
+              <>
+                <Text>Nom</Text>
+                <TextInput
+                  style={styles.input}
+                  onChangeText={handleChange("nom")}
+                  onBlur={handleBlur("nom")}
+                  value={values.nom}
+                />
+                {errors.nom && <Text style={styles.error}>{errors.nom}</Text>}
+
+                <Text>Prénom</Text>
+                <TextInput
+                  style={styles.input}
+                  onChangeText={handleChange("prenom")}
+                  onBlur={handleBlur("prenom")}
+                  value={values.prenom}
+                />
+                {errors.prenom && (
+                  <Text style={styles.error}>{errors.prenom}</Text>
+                )}
+
+                <Text>Téléphone</Text>
+                <TextInput
+                  style={styles.input}
+                  onChangeText={handleChange("telephone")}
+                  onBlur={handleBlur("telephone")}
+                  value={values.telephone}
+                  keyboardType="phone-pad"
+                />
+                {errors.telephone && (
+                  <Text style={styles.error}>{errors.telephone}</Text>
+                )}
+              </>
+            )}
+
+            {/* Email y Mot de Passe, campos comunes */}
+            <Text>E-mail</Text>
+            <TextInput
+              style={styles.input}
+              onChangeText={handleChange("email")}
+              onBlur={handleBlur("email")}
+              value={values.email}
             />
-            <Text style={styles.title}>Inscripción</Text>
-          </View>
+            {errors.email && <Text style={styles.error}>{errors.email}</Text>}
 
-          {/* Radio Button para Pasajero o Conductor */}
-          <View style={styles.radioContainer}>
+            <Text>Mot de passe</Text>
+            <TextInput
+              style={styles.input}
+              onChangeText={handleChange("password")}
+              onBlur={handleBlur("password")}
+              value={values.password}
+              secureTextEntry
+            />
+            {errors.password && (
+              <Text style={styles.error}>{errors.password}</Text>
+            )}
+
+            <Text>Confirmez le mot de passe</Text>
+            <TextInput
+              style={styles.input}
+              onChangeText={handleChange("confirmPassword")}
+              onBlur={handleBlur("confirmPassword")}
+              value={values.confirmPassword}
+              secureTextEntry
+            />
+            {errors.confirmPassword && (
+              <Text style={styles.error}>{errors.confirmPassword}</Text>
+            )}
+
+            <Button onPress={handleSubmit} title="Créer un compte" />
+
+            {/* Enlace a la página de login */}
             <TouchableOpacity
-              onPress={() => setRole("passenger")}
-              style={styles.radioButton}
+              onPress={() => navigation.navigate("LoginScreen")}
             >
-              <Text
-                style={
-                  role === "passenger" ? styles.radioSelected : styles.radio
-                }
-              >
-                Passager
+              <Text style={styles.loginText}>
+                Avez-vous déjà un compte ? Se connecter
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => setRole("driver")}
-              style={styles.radioButton}
-            >
-              <Text
-                style={role === "driver" ? styles.radioSelected : styles.radio}
-              >
-                Conducteur
-              </Text>
-            </TouchableOpacity>
           </View>
-
-          {/* Formulario adicional si es 'passager' */}
-          {role === "passenger" && (
-            <>
-              <Text>Nom</Text>
-              <TextInput
-                style={styles.input}
-                onChangeText={handleChange("nom")}
-                onBlur={handleBlur("nom")}
-                value={values.nom}
-              />
-              {errors.nom && <Text style={styles.error}>{errors.nom}</Text>}
-
-              <Text>Prénom</Text>
-              <TextInput
-                style={styles.input}
-                onChangeText={handleChange("prenom")}
-                onBlur={handleBlur("prenom")}
-                value={values.prenom}
-              />
-              {errors.prenom && (
-                <Text style={styles.error}>{errors.prenom}</Text>
-              )}
-
-              <Text>Téléphone</Text>
-              <TextInput
-                style={styles.input}
-                onChangeText={handleChange("telephone")}
-                onBlur={handleBlur("telephone")}
-                value={values.telephone}
-                keyboardType="phone-pad"
-              />
-              {errors.telephone && (
-                <Text style={styles.error}>{errors.telephone}</Text>
-              )}
-            </>
-          )}
-
-          {/* Email y Mot de Passe, campos comunes */}
-          <Text>E-mail</Text>
-          <TextInput
-            style={styles.input}
-            onChangeText={handleChange("email")}
-            onBlur={handleBlur("email")}
-            value={values.email}
-          />
-          {errors.email && <Text style={styles.error}>{errors.email}</Text>}
-
-          <Text>Mot de passe</Text>
-          <TextInput
-            style={styles.input}
-            onChangeText={handleChange("password")}
-            onBlur={handleBlur("password")}
-            value={values.password}
-            secureTextEntry
-          />
-          {errors.password && (
-            <Text style={styles.error}>{errors.password}</Text>
-          )}
-
-          <Text>Confirmez le mot de passe</Text>
-          <TextInput
-            style={styles.input}
-            onChangeText={handleChange("confirmPassword")}
-            onBlur={handleBlur("confirmPassword")}
-            value={values.confirmPassword}
-            secureTextEntry
-          />
-          {errors.confirmPassword && (
-            <Text style={styles.error}>{errors.confirmPassword}</Text>
-          )}
-
-          <Button onPress={handleSubmit} title="Créer un compte" />
-
-          {/* Enlace a la página de login */}
-          <TouchableOpacity onPress={() => navigation.navigate("LoginScreen")}>
-            <Text style={styles.loginText}>
-              Avez-vous déjà un compte ? Se connecter
-            </Text>
-          </TouchableOpacity>
-        </View>
+        </ScrollView>
       )}
     </Formik>
   );
 };
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    flexGrow: 1,
+  },
   container: {
     flex: 1,
     padding: 16,
