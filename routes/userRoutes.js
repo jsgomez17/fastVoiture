@@ -5,23 +5,29 @@ const User = require("../models/User"); // Importa el modelo de usuario
 
 const router = express.Router();
 
-// Registro de Usuarios
+// Ruta para registrar un usuario
 router.post("/register", async (req, res) => {
   const { nom, prenom, telephone, email, password, role } = req.body;
 
-  // Encriptar la contraseña
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  const newUser = new User({
-    nom,
-    prenom,
-    telephone,
-    email,
-    password: hashedPassword,
-    role,
-  });
-
   try {
+    // Verificar si el usuario ya existe
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: "El usuario ya existe" });
+    }
+
+    // Encriptar la contraseña
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = new User({
+      nom,
+      prenom,
+      telephone,
+      email,
+      password: hashedPassword,
+      role,
+    });
+
     const savedUser = await newUser.save();
     res.status(201).json(savedUser);
   } catch (error) {

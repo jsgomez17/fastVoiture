@@ -7,6 +7,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
+  Alert,
 } from "react-native";
 import { Formik } from "formik";
 import * as Yup from "yup";
@@ -28,10 +29,10 @@ const SignupSchema = Yup.object().shape({
     .required("Requerido"),
 });
 
-const SignupScreen = () => {
+const SignupScreen = ({ navigation }) => {
   const [role, setRole] = useState("passenger"); // Por defecto es 'passenger'
 
-  const handleSignup = async (values) => {
+  const handleSignup = async (values, { resetForm }) => {
     try {
       const response = await axios.post(
         "http://192.168.2.20:3000/api/users/register",
@@ -41,33 +42,51 @@ const SignupScreen = () => {
         }
       );
       console.log("Utilisateur créé:", response.data);
+
+      // Muestra un mensaje de éxito
+      Alert.alert("Succès", "Utilisateur créé avec succès");
+
+      // Limpia los campos del formulario
+      resetForm();
     } catch (error) {
       console.log("Erreur lors de la création de l'utilisateur:", error);
+      // Manejo de errores específicos
+      if (error.response && error.response.status === 400) {
+        Alert.alert("Erreur", "l'utilisateur existe déjà"); // Mensaje del servidor
+      } else {
+        Alert.alert("Erreur", "Impossible de créer un utilisateur");
+      }
     }
   };
 
   return (
     <Formik
       initialValues={{
-        email: "",
-        password: "",
-        confirmPassword: "",
         nom: "",
         prenom: "",
         telephone: "",
-        role: "passenger",
+        email: "",
+        password: "",
+        confirmPassword: "",
       }}
       validationSchema={SignupSchema}
-      onSubmit={(values) => handleSignup(values)}
+      onSubmit={handleSignup} // Se pasa directamente el manejador de envío
     >
-      {({ handleChange, handleBlur, handleSubmit, values, errors }) => (
+      {({
+        handleChange,
+        handleBlur,
+        handleSubmit,
+        values,
+        errors,
+        resetForm,
+      }) => (
         <View style={styles.container}>
           <View style={styles.headerContainer}>
             <Image
-              source={require("../assets/logoFastVoiture.png")} // Chemin de votre logo dans le dossier assets
+              source={require("../assets/logoFastVoiture.png")}
               style={styles.logo}
             />
-            <Text style={styles.title}>Inscription</Text>
+            <Text style={styles.title}>Inscripción</Text>
           </View>
 
           {/* Radio Button para Pasajero o Conductor */}
@@ -132,6 +151,7 @@ const SignupScreen = () => {
               )}
             </>
           )}
+
           {/* Email y Mot de Passe, campos comunes */}
           <Text>E-mail</Text>
           <TextInput
@@ -165,7 +185,15 @@ const SignupScreen = () => {
           {errors.confirmPassword && (
             <Text style={styles.error}>{errors.confirmPassword}</Text>
           )}
+
           <Button onPress={handleSubmit} title="Créer un compte" />
+
+          {/* Enlace a la página de login */}
+          <TouchableOpacity onPress={() => navigation.navigate("LoginScreen")}>
+            <Text style={styles.loginText}>
+              Avez-vous déjà un compte ? Se connecter
+            </Text>
+          </TouchableOpacity>
         </View>
       )}
     </Formik>
@@ -216,6 +244,11 @@ const styles = StyleSheet.create({
   },
   error: {
     color: "red",
+  },
+  loginText: {
+    marginTop: 20,
+    color: "blue",
+    textAlign: "center",
   },
 });
 
