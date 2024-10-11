@@ -17,9 +17,7 @@ import axios from "axios";
 // Esquema de validación de Yup para el formulario de login
 const LoginSchema = Yup.object().shape({
   email: Yup.string().email("Email invalide").required("L'email est requis"),
-  password: Yup.string()
-    .min(6, "Doit contenir au moins 6 caractères")
-    .required("Un mot de passe est requis"),
+  password: Yup.string().min(6, "Doit contenir au moins 6 caractères"),
 });
 
 const LoginScreen = ({ navigation }) => {

@@ -14,7 +14,7 @@ const Reservation = ({ route }) => {
     <View style={styles.container}>
       <Text style={styles.title}>Faire une réservation</Text>
       <Text style={styles.welcomeText}>
-        Bienvenido, {nom} {prenom}
+        Bienvenue, {nom} {prenom}
       </Text>
       {/* Aquí puedes añadir más componentes relacionados con la reserva */}
     </View>
