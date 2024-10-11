@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
   Image,
   Alert,
 } from "react-native";
+import * as LocalAuthentication from "expo-local-authentication"; // Importamos el módulo
 import { Formik } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
@@ -23,6 +24,16 @@ const LoginSchema = Yup.object().shape({
 
 const LoginScreen = ({ navigation }) => {
   const [role, setRole] = useState("passenger"); // Por defecto 'passenger'
+  const [isBiometricSupported, setIsBiometricSupported] = useState(false);
+
+  // Verificar si el dispositivo soporta biometría
+  useEffect(() => {
+    const checkBiometricSupport = async () => {
+      const compatible = await LocalAuthentication.hasHardwareAsync();
+      setIsBiometricSupported(compatible);
+    };
+    checkBiometricSupport();
+  }, []);
 
   const handleLogin = async (values) => {
     try {
@@ -36,8 +47,13 @@ const LoginScreen = ({ navigation }) => {
       );
       console.log("Connexion réussie:", response.data);
 
-      // Aquí redirigimos a la pantalla de reserva
-      navigation.navigate("Reservation");
+      const { nom, prenom } = response.data;
+
+      // Aquí redirigimos a la pantalla de reserva y enviamos nom y prenom
+      navigation.navigate("Reservation", {
+        nom,
+        prenom,
+      });
     } catch (error) {
       console.log("Erreur lors de la connexion:", error);
       // Manejo de errores específicos
@@ -56,6 +72,38 @@ const LoginScreen = ({ navigation }) => {
     }
   };
 
+  // Función para manejar la autenticación biométrica (huella)
+  const handleBiometricAuth = async (email) => {
+    const biometricAuth = await LocalAuthentication.authenticateAsync({
+      promptMessage: "Connectez-vous avec votre empreinte digitale",
+      fallbackLabel: "Utiliser le mot de passe",
+    });
+
+    if (biometricAuth.success) {
+      // Si la autenticación es exitosa, busca al usuario en la base de datos
+      try {
+        console.log("Buscando usuario con email:", email); // Verificar que `email` no esté vacío
+        const response = await axios.get(
+          `http://192.168.2.20:3000/api/users/getUserByEmail?email=${email}`
+        );
+
+        const { nom, prenom } = response.data.user;
+        console.log("Datos del usuario:", nom, prenom);
+
+        // Navega a la pantalla de reserva pasando nom y prenom
+        navigation.navigate("Reservation", {
+          nom,
+          prenom,
+        });
+      } catch (error) {
+        Alert.alert("Erreur", "Utilisateur non trouvé");
+        console.log("Erreur lors de la récupération de l'utilisateur:", error);
+      }
+    } else {
+      Alert.alert("Erreur", "Échec de l'authentification biométrique");
+    }
+  };
+
   return (
     <Formik
       initialValues={{
@@ -63,7 +111,7 @@ const LoginScreen = ({ navigation }) => {
         password: "",
       }}
       validationSchema={LoginSchema}
-      onSubmit={handleLogin}
+      onSubmit={(values) => handleLogin(values)} // Pass the values to handleLogin
     >
       {({ handleChange, handleBlur, handleSubmit, values, errors }) => (
         <View style={styles.container}>
@@ -125,6 +173,18 @@ const LoginScreen = ({ navigation }) => {
           )}
 
           <Button onPress={handleSubmit} title="Se connecter" />
+
+          {/* Botón de autenticación con huella dactilar */}
+          {isBiometricSupported && (
+            <TouchableOpacity
+              style={styles.biometricButton}
+              onPress={() => handleBiometricAuth(values.email)} // Pasar el email aquí
+            >
+              <Text style={styles.biometricText}>
+                Connectez-vous avec votre empreinte digitale
+              </Text>
+            </TouchableOpacity>
+          )}
 
           {/* Enlace a la página de inscripción */}
           <TouchableOpacity onPress={() => navigation.navigate("SignupScreen")}>
@@ -189,6 +249,17 @@ const styles = StyleSheet.create({
     marginTop: 20,
     color: "blue",
     textAlign: "center",
+  },
+  biometricButton: {
+    marginTop: 20,
+    backgroundColor: "blue",
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
+  },
+  biometricText: {
+    color: "white",
+    fontWeight: "bold",
   },
 });
 

@@ -43,11 +43,9 @@ router.post("/login", async (req, res) => {
     // Buscar el usuario por correo
     const user = await User.findOne({ email });
     if (!user) {
-      return res
-        .status(404)
-        .json({
-          message: "L'utilisateur n'existe pas, veuillez vous inscrire.",
-        });
+      return res.status(404).json({
+        message: "L'utilisateur n'existe pas, veuillez vous inscrire.",
+      });
     }
 
     // Verificar la contraseña
@@ -58,11 +56,31 @@ router.post("/login", async (req, res) => {
         .json({ message: "Email ou mot de passe incorrect" });
     }
 
-    // Aquí puedes generar un token JWT y enviarlo como respuesta
-    res.status(200).json({ message: "Connexion réussie", user });
+    // Devolver los datos del usuario, incluyendo el nombre y apellido
+    res.status(200).json({
+      message: "Connexion réussie",
+      nom: user.nom,
+      prenom: user.prenom,
+      email: user.email,
+      role: user.role,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
 
+// Endpoint para buscar un usuario por email
+router.get("/getUserByEmail", async (req, res) => {
+  const { email } = req.query; // Obtener el email de la query
+
+  try {
+    const user = await User.findOne({ email }); // Buscar el usuario en la base de datos
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur introuvable" }); // Si no se encuentra, retornar 404
+    }
+    res.status(200).json({ user }); // Retornar el usuario encontrado
+  } catch (error) {
+    res.status(500).json({ message: error.message }); // Manejar errores
+  }
+});
 module.exports = router;
