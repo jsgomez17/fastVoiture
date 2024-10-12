@@ -80,6 +80,10 @@ const LoginScreen = ({ navigation }) => {
     if (biometricAuth.success) {
       // Si la autenticación es exitosa, busca al usuario en la base de datos
       try {
+        if (!email) {
+          Alert.alert("Erreur", "Veuillez d'abord entrer votre email.");
+          return;
+        }
         console.log("Buscando usuario con email:", email); // Verificar que `email` no esté vacío
         const response = await axios.get(
           `http://192.168.2.20:3000/api/users/getUserByEmail?email=${email}`
