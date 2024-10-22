@@ -8,11 +8,26 @@ import {
   TouchableOpacity,
   Image,
   Alert,
+  //complements for face detection
+  ActivityIndicator,
+  TouchableWithoutFeedback,
 } from "react-native";
 import * as LocalAuthentication from "expo-local-authentication"; // Importamos el módulo
 import { Formik } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
+
+/*Face detection import
+import {
+  useCameraDevice,
+  useCameraPermission,
+  CameraCaptureError,
+  Camera,
+  type VideoFile,
+  type CameraPosition,
+  useFrameProcessor,
+} from 'react-native-vision-camera';
+ */
 
 // Esquema de validación de Yup para el formulario de login
 const LoginSchema = Yup.object().shape({

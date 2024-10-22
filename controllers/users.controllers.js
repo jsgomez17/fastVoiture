@@ -12,12 +12,12 @@ exports.getAllUsers = async (req, res) => {
       invalide`);
     }
     // Obtener la lista de usuarios registrados
-    const user = await User.find()
-      .select("fullname username email lat long")
-      .populate("friends", "username fullname");
+    const user = await User.find().select(
+      "nom prenom telephone email password role"
+    );
     return res.send(user);
   } catch (error) {
-    return res.status(500).send(`Une erreur s'est produite` + error);
+    return res.status(500).send(`Une erreur` + error);
   }
 };
 

@@ -47,14 +47,22 @@ exports.login = (req, res) => {
 
 exports.register = (req, res) => {
   //Recover user, email and password body
-  const { username, email, password } = req.body;
+  const { nom, prenom, telephone, email, password, role } = req.body;
 
-  if (username === undefined || username.trim() === "") {
+  if (nom === undefined || nom.trim() === "") {
     return res
       .status(400)
-      .send(
-        `400 Bad Request : Si des paramètres sont manquants ou invalides. usuario`
-      );
+      .send(`400 Bad Request : Si des paramètres sont manquants ou invalides.`);
+  }
+  if (prenom === undefined || prenom.trim() === "") {
+    return res
+      .status(400)
+      .send(`400 Bad Request : Si des paramètres sont manquants ou invalides.`);
+  }
+  if (telephone === undefined || telephone.trim() === "") {
+    return res
+      .status(400)
+      .send(`400 Bad Request : Si des paramètres sont manquants ou invalides.`);
   }
   if (email === undefined || email.trim() === "") {
     return res
@@ -62,6 +70,11 @@ exports.register = (req, res) => {
       .send(`400 Bad Request : Si des paramètres sont manquants ou invalides.`);
   }
   if (password === undefined || password.trim() === "") {
+    return res
+      .status(400)
+      .send(`400 Bad Request : Si des paramètres sont manquants ou invalides.`);
+  }
+  if (role === undefined || role.trim() === "") {
     return res
       .status(400)
       .send(`400 Bad Request : Si des paramètres sont manquants ou invalides.`);

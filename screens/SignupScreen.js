@@ -38,13 +38,10 @@ const SignupScreen = ({ navigation }) => {
 
   const handleSignup = async (values, { resetForm }) => {
     try {
-      const response = await axios.post(
-        "http://192.168.2.20:3000/api/users/register",
-        {
-          ...values,
-          role,
-        }
-      );
+      const response = await axios.post("http://192.168.0.198:3000/", {
+        ...values,
+        role,
+      });
       console.log("Utilisateur créé:", response.data);
 
       // Muestra un mensaje de éxito
