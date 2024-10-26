@@ -5,6 +5,7 @@ import HomeScreen from "./screens/HomeScreen";
 import LoginScreen from "./screens/LoginScreen"; // Pantalla de login
 import SignupScreen from "./screens/SignupScreen"; // Pantalla de inscripción
 import Reservation from "./screens/Reservation"; // Pantalla de Reservation
+import DestinationSelection from "./screens/DestinationSelection"; // Pantalla de direcciones
 
 const Stack = createStackNavigator();
 
@@ -31,6 +32,11 @@ export default function App() {
           name="Reservation"
           component={Reservation}
           options={{ title: "Reservation" }}
+        />
+        <Stack.Screen
+          name="DestinationSelection"
+          component={DestinationSelection}
+          options={{ title: "Destination Selection" }}
         />
       </Stack.Navigator>
     </NavigationContainer>
