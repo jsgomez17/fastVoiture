@@ -16,20 +16,22 @@ import * as Location from "expo-location";
 import axios from "axios";
 
 const DestinationSelection = ({ route }) => {
-  const [departAddress, setDepartAddress] = useState("Current Location");
+  const [departAddress, setDepartAddress] = useState("Emplacement actuel");
   const [destinationAddress, setDestinationAddress] = useState("");
   const [departCoords, setDepartCoords] = useState(null);
   const [destinationCoords, setDestinationCoords] = useState(null);
   const [suggestions, setSuggestions] = useState([]);
   const [routeCoordinates, setRouteCoordinates] = useState([]);
-  const [focusedField, setFocusedField] = useState(null); // Para saber cuál campo está enfocado
+  const [focusedField, setFocusedField] = useState(null);
 
-  // Obtener la ubicación actual del usuario para establecer el punto de partida por defecto
   useEffect(() => {
     (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
-        Alert.alert("Permissions denied", "Location permission is required.");
+        Alert.alert(
+          "Autorisations refusées",
+          "Une autorisation de localisation est requise."
+        );
         return;
       }
       const location = await Location.getCurrentPositionAsync({});
@@ -41,10 +43,9 @@ const DestinationSelection = ({ route }) => {
     })();
   }, []);
 
-  // Buscar sugerencias de direcciones usando OpenRouteService
   const handleSearchSuggestions = async (text) => {
-    const API_KEY = "5b3ce3597851110001cf6248aca98e72c9a040fd8d3eb2efba526f88"; // Coloca aquí tu API key de OpenRouteService
-    if (text.length < 3) return; // Espera hasta que el usuario haya ingresado al menos 3 caracteres
+    const API_KEY = "5b3ce3597851110001cf6248aca98e72c9a040fd8d3eb2efba526f88";
+    if (text.length < 3) return;
 
     try {
       const response = await axios.get(
@@ -53,20 +54,17 @@ const DestinationSelection = ({ route }) => {
           params: {
             api_key: API_KEY,
             text,
-            size: 5, // Limita el número de sugerencias para una mejor experiencia de usuario
+            size: 5,
           },
         }
       );
-
-      // Actualiza el estado con las sugerencias
       setSuggestions(response.data.features);
     } catch (error) {
-      console.log("Error fetching suggestions:", error);
-      Alert.alert("Error", "Failed to fetch suggestions.");
+      console.log("Erreur lors de la récupération des suggestions:", error);
+      Alert.alert("Erreur", "Impossible de récupérer les suggestions.");
     }
   };
 
-  // Maneja la selección de una sugerencia
   const handleSelectSuggestion = (suggestion) => {
     const { geometry, properties } = suggestion;
     const coords = {
@@ -84,11 +82,10 @@ const DestinationSelection = ({ route }) => {
     setSuggestions([]);
   };
 
-  // Obtener la ruta desde la API de OpenRouteService
   const handleGetRoute = async () => {
-    const API_KEY = "5b3ce3597851110001cf6248aca98e72c9a040fd8d3eb2efba526f88"; // Reemplaza con tu API key de OpenRouteService
+    const API_KEY = "5b3ce3597851110001cf6248aca98e72c9a040fd8d3eb2efba526f88";
     if (!departCoords || !destinationCoords) {
-      Alert.alert("Error", "Por favor selecciona ambas direcciones.");
+      Alert.alert("Erreur", "Veuillez sélectionner les deux adresses.");
       return;
     }
     try {
@@ -110,15 +107,31 @@ const DestinationSelection = ({ route }) => {
       );
       setRouteCoordinates(coordinates);
     } catch (error) {
-      console.log("Error fetching route:", error);
-      Alert.alert("Error", "Failed to fetch route.");
+      console.log("Erreur lors de la récupération de l'itinéraire:", error);
+      Alert.alert("Erreur", "Impossible de récupérer l'itinéraire.");
     }
+  };
+
+  // Función para manejar la reserva
+  const handleReserve = () => {
+    if (!departCoords || !destinationCoords) {
+      Alert.alert(
+        "Erreur",
+        "Veuillez compléter les adresses de départ et de destination."
+      );
+      return;
+    }
+    Alert.alert(
+      "Réservation confirmée",
+      `La réservation de ${departAddress} à ${destinationAddress} a été effectuée avec succès!`
+    );
+    setDestinationAddress("");
+    setRouteCoordinates([]);
   };
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>
-        {/* Logo y título */}
         <View style={styles.headerContainer}>
           <Image
             source={require("../assets/logoFastVoiture.png")}
@@ -127,33 +140,30 @@ const DestinationSelection = ({ route }) => {
           <Text style={styles.title}>Réserve course</Text>
         </View>
 
-        {/* Campo de dirección de origen */}
         <Text style={styles.label}>Adresse de départ:</Text>
         <TextInput
           style={styles.input}
           placeholder="Entrez l'adresse de départ"
           value={departAddress}
-          onFocus={() => setFocusedField("origin")} // Establece el campo activo
+          onFocus={() => setFocusedField("origin")}
           onChangeText={(text) => {
             setDepartAddress(text);
             handleSearchSuggestions(text);
           }}
         />
 
-        {/* Campo de dirección de destino */}
         <Text style={styles.label}>Adresse de destination:</Text>
         <TextInput
           style={styles.input}
           placeholder="Entrez l'adresse de destination"
           value={destinationAddress}
-          onFocus={() => setFocusedField("destination")} // Establece el campo activo
+          onFocus={() => setFocusedField("destination")}
           onChangeText={(text) => {
             setDestinationAddress(text);
             handleSearchSuggestions(text);
           }}
         />
 
-        {/* Lista de sugerencias */}
         {suggestions.length > 0 && (
           <FlatList
             data={suggestions}
@@ -165,12 +175,12 @@ const DestinationSelection = ({ route }) => {
                 </Text>
               </TouchableOpacity>
             )}
+            style={styles.suggestionsList}
           />
         )}
 
         <Button title="Afficher la route" onPress={handleGetRoute} />
 
-        {/* Mapa con marcadores y ruta */}
         <MapView
           style={styles.map}
           initialRegion={{
@@ -191,6 +201,11 @@ const DestinationSelection = ({ route }) => {
           )}
           <Polyline coordinates={routeCoordinates} strokeColor="blue" />
         </MapView>
+
+        {/* Botón de reserva */}
+        <TouchableOpacity style={styles.reserveButton} onPress={handleReserve}>
+          <Text style={styles.reserveButtonText}>Réserver</Text>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
@@ -236,6 +251,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 5,
   },
+  suggestionsList: {
+    maxHeight: 150,
+    backgroundColor: "#fff",
+    borderRadius: 5,
+    marginTop: 5,
+    marginBottom: 15,
+    elevation: 5,
+  },
   suggestionText: {
     padding: 10,
     borderBottomColor: "#ccc",
@@ -247,6 +270,18 @@ const styles = StyleSheet.create({
     marginTop: 20,
     borderRadius: 10,
     marginBottom: 20,
+  },
+  reserveButton: {
+    backgroundColor: "#007bff",
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
+    marginTop: 10,
+  },
+  reserveButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16,
   },
 });
 
