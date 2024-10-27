@@ -26,8 +26,8 @@ exports.getSingleUser = (req, res) => {
   res.send(User.findById(id));
 };
 
-exports.createSingleUser = (req, res) => {
-  User.create(req.body);
+exports.createSingleUser = async (req, res) => {
+  await User.create(req.body);
   res.send(`Successfully created`);
 };
 

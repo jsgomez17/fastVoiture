@@ -1,6 +1,9 @@
 //External imports
 const express = require("express");
 
+//Variables
+const router = express.Router();
+
 //Internal imports
 const userControllers = require("../controllers/users.controllers");
 
@@ -10,9 +13,6 @@ const jwt = require("jsonwebtoken");
 
 const User = require("../models/Users"); // Importa el modelo de usuario
 */
-
-//Variables
-const router = express.Router();
 
 router
   .route("")
