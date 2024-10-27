@@ -19,6 +19,11 @@ const Reservation = ({ route, navigation }) => {
     navigation.navigate("DestinationSelection"); // Navega a la pantalla de selección de dirección
   };
 
+  // Función para navegar a la pantalla de reservacion de course
+  const handleGoToReservationLater = () => {
+    navigation.navigate("ReservationLater"); // Navega a la pantalla de selección de dirección
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>
@@ -67,7 +72,10 @@ const Reservation = ({ route, navigation }) => {
             <Text style={styles.suggestionText}>Course</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.suggestionCard}>
+          <TouchableOpacity
+            style={styles.suggestionCard}
+            onPress={handleGoToReservationLater}
+          >
             <Image
               source={require("../assets/reserve-icon.png")}
               style={styles.icon}

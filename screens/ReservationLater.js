@@ -15,8 +15,9 @@ import MapView, { Marker, Polyline } from "react-native-maps";
 import * as Location from "expo-location";
 import { FontAwesome } from "@expo/vector-icons";
 import axios from "axios";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 
-const DestinationSelection = ({ route }) => {
+const ReservationLater = ({ route }) => {
   const [departAddress, setDepartAddress] = useState("Emplacement actuel");
   const [destinationAddress, setDestinationAddress] = useState("");
   const [departCoords, setDepartCoords] = useState(null);
@@ -26,6 +27,11 @@ const DestinationSelection = ({ route }) => {
   const [focusedField, setFocusedField] = useState(null);
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [vehicleOptions, setVehicleOptions] = useState([]); // Estado para almacenar los datos actualizados de vehículos
+  const [date, setDate] = useState(null);
+  const [time, setTime] = useState(null);
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [isTimePickerVisible, setTimePickerVisibility] = useState(false);
+
   // Obtener la ubicación actual del usuario
   useEffect(() => {
     (async () => {
@@ -86,7 +92,7 @@ const DestinationSelection = ({ route }) => {
     setSuggestions([]);
   };
 
-  // Función para obtener la ruta
+  // Función para obtener la ruta y la distancia
   const handleGetRoute = async () => {
     const API_KEY = "5b3ce3597851110001cf6248aca98e72c9a040fd8d3eb2efba526f88";
     if (!departCoords || !destinationCoords) {
@@ -128,14 +134,43 @@ const DestinationSelection = ({ route }) => {
 
   // Función para manejar la reserva
   const handleReserve = () => {
-    if (!selectedVehicle) {
-      Alert.alert("Erreur", "Veuillez sélectionner un type de véhicule.");
+    if (!selectedVehicle || !date || !time) {
+      Alert.alert(
+        "Erreur",
+        "Veuillez sélectionner un type de véhicule, une date et une heure."
+      );
       return;
     }
     Alert.alert(
       "Réservation confirmée",
-      `Vous avez choisi ${selectedVehicle.type}`
+      `Vous avez choisi ${selectedVehicle.type} pour ${date} à ${time}`
     );
+  };
+
+  const showDatePicker = () => {
+    setDatePickerVisibility(true);
+  };
+
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false);
+  };
+
+  const handleConfirmDate = (selectedDate) => {
+    setDate(selectedDate.toLocaleDateString());
+    hideDatePicker();
+  };
+
+  const showTimePicker = () => {
+    setTimePickerVisibility(true);
+  };
+
+  const hideTimePicker = () => {
+    setTimePickerVisibility(false);
+  };
+
+  const handleConfirmTime = (selectedTime) => {
+    setTime(selectedTime.toLocaleTimeString());
+    hideTimePicker();
   };
 
   return (
@@ -146,7 +181,7 @@ const DestinationSelection = ({ route }) => {
             source={require("../assets/logoFastVoiture.png")}
             style={styles.logo}
           />
-          <Text style={styles.title}>Réserve course</Text>
+          <Text style={styles.title}>Réserver une course plus tard</Text>
         </View>
 
         <Text style={styles.label}>Adresse de départ:</Text>
@@ -187,6 +222,33 @@ const DestinationSelection = ({ route }) => {
             style={styles.suggestionsList}
           />
         )}
+
+        {/* Selección de fecha y hora */}
+        <View style={styles.datetimeContainer}>
+          <TouchableOpacity onPress={showDatePicker} style={styles.dateButton}>
+            <Text style={styles.dateText}>
+              {date ? `Date: ${date}` : "Sélectionner la date"}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={showTimePicker} style={styles.dateButton}>
+            <Text style={styles.dateText}>
+              {time ? `Heure: ${time}` : "Sélectionner l'heure"}
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        <DateTimePickerModal
+          isVisible={isDatePickerVisible}
+          mode="date"
+          onConfirm={handleConfirmDate}
+          onCancel={hideDatePicker}
+        />
+        <DateTimePickerModal
+          isVisible={isTimePickerVisible}
+          mode="time"
+          onConfirm={handleConfirmTime}
+          onCancel={hideTimePicker}
+        />
 
         <Button title="Afficher la route" onPress={handleGetRoute} />
 
@@ -270,10 +332,10 @@ const styles = StyleSheet.create({
   logo: {
     width: 70,
     height: 70,
-    marginRight: 10,
+    marginRight: 0,
   },
   title: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: "bold",
     textAlign: "center",
   },
@@ -290,6 +352,23 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     paddingHorizontal: 10,
     borderRadius: 5,
+  },
+  datetimeContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginVertical: 10,
+  },
+  dateButton: {
+    backgroundColor: "#007bff",
+    padding: 10,
+    borderRadius: 10,
+    alignItems: "center",
+    flex: 1,
+    marginHorizontal: 5,
+  },
+  dateText: {
+    color: "#fff",
+    fontSize: 16,
   },
   suggestionsList: {
     maxHeight: 150,
@@ -368,12 +447,6 @@ const styles = StyleSheet.create({
     textAlign: "left",
     marginRight: 10,
   },
-  vehicleDetails: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    width: "100%",
-  },
   vehicleCapacity: {
     fontSize: 14,
     color: "gray",
@@ -391,4 +464,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DestinationSelection;
+export default ReservationLater;

@@ -6,6 +6,7 @@ import LoginScreen from "./screens/LoginScreen"; // Pantalla de login
 import SignupScreen from "./screens/SignupScreen"; // Pantalla de inscripción
 import Reservation from "./screens/Reservation"; // Pantalla de Reservation
 import DestinationSelection from "./screens/DestinationSelection"; // Pantalla de direcciones
+import ReservationLater from "./screens/ReservationLater"; // Pantalla de reservacion mas tarde
 
 const Stack = createStackNavigator();
 
@@ -37,6 +38,11 @@ export default function App() {
           name="DestinationSelection"
           component={DestinationSelection}
           options={{ title: "Destination Selection" }}
+        />
+        <Stack.Screen
+          name="ReservationLater"
+          component={ReservationLater}
+          options={{ title: "Réservation plus tard" }}
         />
       </Stack.Navigator>
     </NavigationContainer>

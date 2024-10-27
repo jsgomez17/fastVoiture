@@ -1,7 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const userRoutes = require("./routes/userRoutes"); // Importa las rutas de usuario
-
+const voitureRoutes = require("./routes/voitureRoutes"); // Importa las rutas de vehiculo
 const app = express();
 app.use(express.json());
 
@@ -19,6 +19,10 @@ mongoose
 // Usar las rutas de usuario
 app.use("/api/users", userRoutes); // Prefijo para las rutas de usuario
 
+// Usar las rutas de vehiculos
+app.use("/api", voitureRoutes);
+
+app.use("/public", express.static("public"));
 // Iniciar el Servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
