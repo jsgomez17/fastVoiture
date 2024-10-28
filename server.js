@@ -30,7 +30,7 @@ const getLocalIP = () => {
 const connect = async () => {
   try {
     const conn = await mongoose.connect(
-      "mongodb+srv://dev:7M8kBThwo19zr4Sf@cluster0.td7pq.mongodb.net/"
+      "mongodb+srv://dev:B1yWZQPOTdpVl1OX@cluster0.44esk.mongodb.net/"
     );
     console.log(`db connect to : ${conn.connection.host}`);
   } catch (error) {
