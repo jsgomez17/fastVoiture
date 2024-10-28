@@ -45,12 +45,13 @@ const LoginScreen = ({ navigation }) => {
       );
       console.log("Connexion réussie:", response.data);
 
-      const { nom, prenom } = response.data;
+      const { nom, prenom, email } = response.data;
 
       // Aquí redirigimos a la pantalla de reserva y enviamos nom y prenom
       navigation.navigate("Reservation", {
         nom,
         prenom,
+        email,
       });
     } catch (error) {
       console.log("Erreur lors de la connexion:", error);
@@ -90,12 +91,13 @@ const LoginScreen = ({ navigation }) => {
         );
 
         const { nom, prenom } = response.data.user;
-        console.log("Datos del usuario:", nom, prenom);
+        console.log("Datos del usuario:", nom, prenom, email);
 
         // Navega a la pantalla de reserva pasando nom y prenom
         navigation.navigate("Reservation", {
           nom,
           prenom,
+          email,
         });
       } catch (error) {
         Alert.alert("Erreur", "Utilisateur non trouvé");
@@ -120,7 +122,7 @@ const LoginScreen = ({ navigation }) => {
           {/* Logo y título */}
           <View style={styles.headerContainer}>
             <Image
-              source={require("../assets/logoFastVoiture.png")}
+              source={require("../public/assets/logoFastVoiture.png")}
               style={styles.logo}
             />
             <Text style={styles.title}>Connecter</Text>

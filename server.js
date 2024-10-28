@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const userRoutes = require("./routes/userRoutes"); // Importa las rutas de usuario
 const voitureRoutes = require("./routes/voitureRoutes"); // Importa las rutas de vehiculo
+const reservationRoutes = require("./routes/reservationRoutes"); // Importa las rutas de reservacion
 const app = express();
 app.use(express.json());
 
@@ -21,6 +22,8 @@ app.use("/api/users", userRoutes); // Prefijo para las rutas de usuario
 
 // Usar las rutas de vehiculos
 app.use("/api", voitureRoutes);
+
+app.use("/api", reservationRoutes); // Usa las rutas de reservas
 
 app.use("/public", express.static("public"));
 // Iniciar el Servidor

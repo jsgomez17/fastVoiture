@@ -81,7 +81,7 @@ const SignupScreen = ({ navigation }) => {
           <View style={styles.container}>
             <View style={styles.headerContainer}>
               <Image
-                source={require("../assets/logoFastVoiture.png")}
+                source={require("../public/assets/logoFastVoiture.png")}
                 style={styles.logo}
               />
               <Text style={styles.title}>Inscripción</Text>

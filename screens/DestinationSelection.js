@@ -26,9 +26,12 @@ const DestinationSelection = ({ route }) => {
   const [focusedField, setFocusedField] = useState(null);
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [vehicleOptions, setVehicleOptions] = useState([]); // Estado para almacenar los datos actualizados de vehículos
-  // Obtener la ubicación actual del usuario
+  const { email } = route.params;
+
+  // Obtener la ubicación actual del usuario y el ID desde AsyncStorage
   useEffect(() => {
     (async () => {
+      // Solicitar permisos de ubicación
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
         Alert.alert(
@@ -37,6 +40,8 @@ const DestinationSelection = ({ route }) => {
         );
         return;
       }
+
+      // Obtener la ubicación actual
       const location = await Location.getCurrentPositionAsync({});
       const currentCoords = {
         latitude: location.coords.latitude,
@@ -127,15 +132,37 @@ const DestinationSelection = ({ route }) => {
   };
 
   // Función para manejar la reserva
-  const handleReserve = () => {
+  const handleReserve = async () => {
     if (!selectedVehicle) {
       Alert.alert("Erreur", "Veuillez sélectionner un type de véhicule.");
       return;
     }
-    Alert.alert(
-      "Réservation confirmée",
-      `Vous avez choisi ${selectedVehicle.type}`
-    );
+    console.log("User ID:", email);
+    const reservationData = {
+      idcourse: Math.random().toString(36).substring(2, 15), // Genera un ID aleatorio para la reserva
+      date: new Date().toISOString(),
+      address_depart: departAddress,
+      address_destination: destinationAddress,
+      type_vehicule: selectedVehicle.type,
+      capacity: selectedVehicle.capacity,
+      prix: parseFloat(selectedVehicle.price.replace(" $CA", "")), // Elimina "$CA" y convierte a número
+      id_usuario: email, // Reemplaza con el ID real del usuario si está disponible
+      estado: "en course",
+    };
+
+    try {
+      const response = await axios.post(
+        "http://192.168.2.20:3000/api/reserver",
+        reservationData
+      );
+      Alert.alert(
+        "Réservation confirmée",
+        `Réservation pour le véhicule ${selectedVehicle.type} confirmée!`
+      );
+    } catch (error) {
+      console.error("Erreur lors de la réservation:", error);
+      Alert.alert("Erreur", "Erreur lors de la création de la réservation.");
+    }
   };
 
   return (
@@ -143,7 +170,7 @@ const DestinationSelection = ({ route }) => {
       <View style={styles.container}>
         <View style={styles.headerContainer}>
           <Image
-            source={require("../assets/logoFastVoiture.png")}
+            source={require("../public/assets/logoFastVoiture.png")}
             style={styles.logo}
           />
           <Text style={styles.title}>Réserve course</Text>
@@ -223,7 +250,7 @@ const DestinationSelection = ({ route }) => {
                 styles.vehicleOption,
                 selectedVehicle === item.id && styles.selectedVehicleOption,
               ]}
-              onPress={() => setSelectedVehicle(item.id)}
+              onPress={() => setSelectedVehicle(item)}
             >
               <Image
                 source={{ uri: item.image }}

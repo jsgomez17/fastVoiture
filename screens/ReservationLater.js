@@ -31,6 +31,7 @@ const ReservationLater = ({ route }) => {
   const [time, setTime] = useState(null);
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [isTimePickerVisible, setTimePickerVisibility] = useState(false);
+  const { email } = route.params;
 
   // Obtener la ubicación actual del usuario
   useEffect(() => {
@@ -133,7 +134,7 @@ const ReservationLater = ({ route }) => {
   };
 
   // Función para manejar la reserva
-  const handleReserve = () => {
+  const handleReserve = async () => {
     if (!selectedVehicle || !date || !time) {
       Alert.alert(
         "Erreur",
@@ -141,10 +142,37 @@ const ReservationLater = ({ route }) => {
       );
       return;
     }
-    Alert.alert(
-      "Réservation confirmée",
-      `Vous avez choisi ${selectedVehicle.type} pour ${date} à ${time}`
-    );
+
+    // Combinar la fecha y hora en un formato de objeto Date
+    const [day, month, year] = date.split("/");
+    const [hours, minutes, seconds] = time.split(":");
+    const datetime = new Date(year, month - 1, day, hours, minutes, seconds);
+
+    const reservationData = {
+      idcourse: Math.random().toString(36).substring(2, 15), // Genera un ID aleatorio para la reserva
+      date: datetime, // Guarda la fecha y hora combinadas
+      address_depart: departAddress,
+      address_destination: destinationAddress,
+      type_vehicule: selectedVehicle.type,
+      capacity: selectedVehicle.capacity,
+      prix: parseFloat(selectedVehicle.price.replace(" $CA", "")), // Elimina "$CA" y convierte a número
+      id_usuario: email, // ID del usuario como email
+      estado: "reservado pour plus tard",
+    };
+
+    try {
+      const response = await axios.post(
+        "http://192.168.2.20:3000/api/reserver",
+        reservationData
+      );
+      Alert.alert(
+        "Réservation confirmée",
+        `Réservation pour le véhicule ${selectedVehicle.type} confirmée pour le ${datetime}!`
+      );
+    } catch (error) {
+      console.error("Erreur lors de la réservation:", error);
+      Alert.alert("Erreur", "Erreur lors de la création de la réservation.");
+    }
   };
 
   const showDatePicker = () => {
@@ -178,7 +206,7 @@ const ReservationLater = ({ route }) => {
       <View style={styles.container}>
         <View style={styles.headerContainer}>
           <Image
-            source={require("../assets/logoFastVoiture.png")}
+            source={require("../public/assets/logoFastVoiture.png")}
             style={styles.logo}
           />
           <Text style={styles.title}>Réserver une course plus tard</Text>
@@ -285,7 +313,7 @@ const ReservationLater = ({ route }) => {
                 styles.vehicleOption,
                 selectedVehicle === item.id && styles.selectedVehicleOption,
               ]}
-              onPress={() => setSelectedVehicle(item.id)}
+              onPress={() => setSelectedVehicle(item)}
             >
               <Image
                 source={{ uri: item.image }}

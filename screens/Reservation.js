@@ -12,16 +12,20 @@ import { Ionicons } from "@expo/vector-icons";
 
 const Reservation = ({ route, navigation }) => {
   // Extraemos los datos pasados desde la pantalla de inicio de sesión
-  const { nom, prenom } = route.params;
+  const { nom, prenom, email } = route.params;
 
   // Función para navegar a la pantalla de selección de dirección
   const handleGoToDestinationScreen = () => {
-    navigation.navigate("DestinationSelection"); // Navega a la pantalla de selección de dirección
+    navigation.navigate("DestinationSelection", {
+      email, // Paso opcional para pasarlo directamente
+    });
   };
 
   // Función para navegar a la pantalla de reservacion de course
   const handleGoToReservationLater = () => {
-    navigation.navigate("ReservationLater"); // Navega a la pantalla de selección de dirección
+    navigation.navigate("ReservationLater", {
+      email,
+    }); // Navega a la pantalla de selección de dirección
   };
 
   return (
@@ -30,7 +34,7 @@ const Reservation = ({ route, navigation }) => {
         {/* Logo y título */}
         <View style={styles.headerContainer}>
           <Image
-            source={require("../assets/logoFastVoiture.png")}
+            source={require("../public/assets/logoFastVoiture.png")}
             style={styles.logo}
           />
           <Text style={styles.title}>Réserve course</Text>
@@ -43,7 +47,7 @@ const Reservation = ({ route, navigation }) => {
 
         {/* Animación en la parte superior */}
         <LottieView
-          source={require("../assets/car-animation.json")} // Archivo de animación Lottie
+          source={require("../public/assets/car-animation.json")} // Archivo de animación Lottie
           autoPlay
           loop
           style={styles.animation}
@@ -66,7 +70,7 @@ const Reservation = ({ route, navigation }) => {
             onPress={handleGoToDestinationScreen} // Navega al presionar
           >
             <Image
-              source={require("../assets/car-icon.png")}
+              source={require("../public/assets/car-icon.png")}
               style={styles.icon}
             />
             <Text style={styles.suggestionText}>Course</Text>
@@ -77,7 +81,7 @@ const Reservation = ({ route, navigation }) => {
             onPress={handleGoToReservationLater}
           >
             <Image
-              source={require("../assets/reserve-icon.png")}
+              source={require("../public/assets/reserve-icon.png")}
               style={styles.icon}
             />
             <Text style={styles.suggestionText}>Réserver</Text>

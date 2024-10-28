@@ -7,7 +7,7 @@ const HomeScreen = ({ navigation }) => {
     <View style={styles.container}>
       {/* Logo de l'application */}
       <Image
-        source={require("../assets/logoFastVoiture.png")} // Chemin de votre logo dans le dossier assets
+        source={require("../public/assets/logoFastVoiture.png")} // Chemin de votre logo dans le dossier assets
         style={styles.logo}
       />
 
