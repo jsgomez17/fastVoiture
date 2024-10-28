@@ -13,6 +13,7 @@ import * as LocalAuthentication from "expo-local-authentication"; // Importamos 
 import { Formik } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
+import { API_IP } from "../config";
 
 // Esquema de validación de Yup para el formulario de login
 const LoginSchema = Yup.object().shape({
@@ -35,14 +36,11 @@ const LoginScreen = ({ navigation }) => {
 
   const handleLogin = async (values) => {
     try {
-      const response = await axios.post(
-        "http://192.168.2.20:3000/api/users/login",
-        {
-          email: values.email,
-          password: values.password,
-          role,
-        }
-      );
+      const response = await axios.post(`${API_IP}/api/users/login`, {
+        email: values.email,
+        password: values.password,
+        role,
+      });
       console.log("Connexion réussie:", response.data);
 
       const { nom, prenom, email } = response.data;
@@ -87,7 +85,7 @@ const LoginScreen = ({ navigation }) => {
         }
         console.log("Buscando usuario con email:", email); // Verificar que `email` no esté vacío
         const response = await axios.get(
-          `http://192.168.2.20:3000/api/users/getUserByEmail?email=${email}`
+          `${API_IP}/api/users/getUserByEmail?email=${email}`
         );
 
         const { nom, prenom } = response.data.user;
