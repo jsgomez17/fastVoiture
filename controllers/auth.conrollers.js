@@ -37,7 +37,7 @@ exports.login = async (req, res) => {
     }
     //search user with email of body
     const user = User.findOne({ email });
-    console.log("Usuario encontrado:", user); // Añade esta línea
+    console.log("Usuario encontrado: ", user); // Añade esta línea
 
     if (user === null || user.password === null) {
       return res
@@ -151,7 +151,7 @@ exports.register = async (req, res) => {
     }
 
     //Check if the user already exists
-    existingUser = User.findByEmail(email);
+    existingUser = User.findOne(email);
     if (existingUser != null) {
       return res
         .status(409)
