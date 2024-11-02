@@ -13,6 +13,7 @@ import {
 import { Formik } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
+import { API_IP } from "../config";
 
 // Esquema de validación de Yup
 const SignupSchema = Yup.object().shape({
@@ -38,13 +39,10 @@ const SignupScreen = ({ navigation }) => {
 
   const handleSignup = async (values, { resetForm }) => {
     try {
-      const response = await axios.post(
-        "http://192.168.2.20:3000/api/users/register",
-        {
-          ...values,
-          role,
-        }
-      );
+      const response = await axios.post(`${API_IP}/api/users/register`, {
+        ...values,
+        role,
+      });
       console.log("Utilisateur créé:", response.data);
 
       // Muestra un mensaje de éxito
