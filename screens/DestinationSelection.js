@@ -15,7 +15,6 @@ import MapView, { Marker, Polyline } from "react-native-maps";
 import * as Location from "expo-location";
 import { FontAwesome } from "@expo/vector-icons";
 import axios from "axios";
-import { API_IP } from "../config";
 
 const DestinationSelection = ({ route }) => {
   const [departAddress, setDepartAddress] = useState("Emplacement actuel");
@@ -121,9 +120,10 @@ const DestinationSelection = ({ route }) => {
         response.data.features[0].properties.segments[0].distance / 1000; // en km
 
       // Solicitar precios al backend con la distancia calculada
-      const priceResponse = await axios.post(`${API_IP}/api/calculer-prix`, {
-        distance,
-      });
+      const priceResponse = await axios.post(
+        "http://192.168.2.20:3000/api/calculer-prix",
+        { distance }
+      );
       setVehicleOptions(priceResponse.data); // Actualizar estado de opciones de vehículo
     } catch (error) {
       console.log("Erreur lors de la récupération de l'itinéraire:", error);
@@ -152,7 +152,7 @@ const DestinationSelection = ({ route }) => {
 
     try {
       const response = await axios.post(
-        `${API_IP}/api/reserver`,
+        "http://192.168.2.20:3000/api/reserver",
         reservationData
       );
       Alert.alert(
