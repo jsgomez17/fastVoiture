@@ -123,9 +123,12 @@ const ReservationLater = ({ route }) => {
         response.data.features[0].properties.segments[0].distance / 1000; // en km
 
       // Solicitar precios al backend con la distancia calculada
-      const priceResponse = await axios.post(`${API_IP}/api/calculer-prix`, {
-        distance,
-      });
+      const priceResponse = await axios.post(
+        `${API_IP}/voitures/calculer-prix/`,
+        {
+          distance,
+        }
+      );
       setVehicleOptions(priceResponse.data); // Actualizar estado de opciones de vehículo
     } catch (error) {
       console.log("Erreur lors de la récupération de l'itinéraire:", error);

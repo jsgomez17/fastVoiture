@@ -1,2 +1,2 @@
 // config.js
-export const API_IP = "http://192.168.2.20:3000";
+export const API_IP = "http://192.168.0.198:3000";

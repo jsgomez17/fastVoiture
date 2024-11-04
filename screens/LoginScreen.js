@@ -36,7 +36,7 @@ const LoginScreen = ({ navigation }) => {
 
   const handleLogin = async (values) => {
     try {
-      const response = await axios.post(`${API_IP}/api/users/login`, {
+      const response = await axios.post(`${API_IP}/users/login/`, {
         email: values.email,
         password: values.password,
         role,
