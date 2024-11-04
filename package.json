@@ -14,6 +14,7 @@
     "@react-navigation/stack": "^6.4.1",
     "axios": "^1.7.7",
     "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.5",
     "expo": "~51.0.28",
     "expo-local-authentication": "~14.0.1",
     "expo-location": "^17.0.1",
@@ -22,7 +23,11 @@
     "formik": "^2.4.6",
     "jsonwebtoken": "^9.0.2",
     "lottie-react-native": "^7.0.0",
+<<<<<<< Updated upstream
     "mongoose": "^8.8.0",
+=======
+    "mongoose": "^8.7.3",
+>>>>>>> Stashed changes
     "react": "18.2.0",
     "react-native": "0.74.5",
     "react-native-maps": "^1.18.2",
