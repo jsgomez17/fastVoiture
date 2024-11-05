@@ -3,6 +3,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import HomeScreen from "./screens/HomeScreen";
 import LoginScreen from "./screens/LoginScreen"; // Pantalla de login
+import FaceRecognitionScreen from "./screens/FaceRecognitionScreen"; //pantalla de faceRegnitions
 import SignupScreen from "./screens/SignupScreen"; // Pantalla de inscripción
 import Reservation from "./screens/Reservation"; // Pantalla de Reservation
 import DestinationSelection from "./screens/DestinationSelection"; // Pantalla de direcciones
@@ -23,6 +24,10 @@ export default function App() {
           name="LoginScreen"
           component={LoginScreen}
           options={{ title: "Se connecter" }}
+        />
+        <Stack.Screen
+          name="FaceRecognitionScreen"
+          component={FaceRecognitionScreen}
         />
         <Stack.Screen
           name="SignupScreen"

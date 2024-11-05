@@ -9,7 +9,7 @@ import {
   Image,
   Alert,
 } from "react-native";
-import * as LocalAuthentication from "expo-local-authentication"; // Importamos el módulo
+import * as LocalAuthentication from "expo-local-authentication"; // Importamos el módulos de reconocimiento
 import { Formik } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
@@ -106,6 +106,11 @@ const LoginScreen = ({ navigation }) => {
     }
   };
 
+  // Función para manejar la autenticación FaceRecognitionScreen
+  const handleFaceRecognition = () => {
+    navigation.navigate("FaceRecognitionScreen", { role });
+  };
+
   return (
     <Formik
       initialValues={{
@@ -188,6 +193,16 @@ const LoginScreen = ({ navigation }) => {
             </TouchableOpacity>
           )}
 
+          {/* Botón de autenticación facial */}
+          <TouchableOpacity
+            style={styles.faceRecognitionButton}
+            onPress={handleFaceRecognition}
+          >
+            <Text style={styles.faceRecognitionText}>
+              Connectez-vous avec reconnaissance faciale
+            </Text>
+          </TouchableOpacity>
+
           {/* Enlace a la página de inscripción */}
           <TouchableOpacity onPress={() => navigation.navigate("SignupScreen")}>
             <Text style={styles.loginText}>
@@ -260,6 +275,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   biometricText: {
+    color: "white",
+    fontWeight: "bold",
+  },
+  faceRecognitionButton: {
+    marginTop: 20,
+    backgroundColor: "blue",
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
+  },
+  faceRecognitionText: {
     color: "white",
     fontWeight: "bold",
   },
