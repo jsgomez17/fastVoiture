@@ -1,6 +1,7 @@
 // HomeScreen.js
 import React from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
+import LottieView from "lottie-react-native"; // Importa Lottie para la animación
 
 const HomeScreen = ({ navigation }) => {
   return (
@@ -13,6 +14,14 @@ const HomeScreen = ({ navigation }) => {
 
       {/* Texte de bienvenue */}
       <Text style={styles.title}>¡Bienvenue à FastVoiture!</Text>
+
+      {/* Animación en la parte superior */}
+      <LottieView
+        source={require("../public/assets/car-animation.json")} // Archivo de animación Lottie
+        autoPlay
+        loop
+        style={styles.animation}
+      />
 
       {/* Bouton pour se connecter */}
       <TouchableOpacity
@@ -43,12 +52,10 @@ const styles = StyleSheet.create({
   logo: {
     width: 150,
     height: 150,
-    marginBottom: 30,
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 20,
   },
   button: {
     backgroundColor: "#1e90ff",
@@ -65,6 +72,11 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 18,
     fontWeight: "bold",
+  },
+  animation: {
+    width: 200,
+    height: 200,
+    alignSelf: "center",
   },
 });
 
