@@ -17,7 +17,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import axios from "axios";
 import { API_IP } from "../config";
 
-const DestinationSelection = ({ route }) => {
+const DestinationSelection = ({ route, navigation }) => {
   const [departAddress, setDepartAddress] = useState("Emplacement actuel");
   const [destinationAddress, setDestinationAddress] = useState("");
   const [departCoords, setDepartCoords] = useState(null);
@@ -121,9 +121,12 @@ const DestinationSelection = ({ route }) => {
         response.data.features[0].properties.segments[0].distance / 1000; // en km
 
       // Solicitar precios al backend con la distancia calculada
-      const priceResponse = await axios.post(`${API_IP}/api/calculer-prix`, {
-        distance,
-      });
+      const priceResponse = await axios.post(
+        `${API_IP}/voitures/calculer-prix/`,
+        {
+          distance,
+        }
+      );
       setVehicleOptions(priceResponse.data); // Actualizar estado de opciones de vehículo
     } catch (error) {
       console.log("Erreur lors de la récupération de l'itinéraire:", error);
@@ -152,13 +155,15 @@ const DestinationSelection = ({ route }) => {
 
     try {
       const response = await axios.post(
-        `${API_IP}/api/reserver`,
+        `${API_IP}/reservations/reserver`,
         reservationData
       );
-      Alert.alert(
-        "Réservation confirmée",
-        `Réservation pour le véhicule ${selectedVehicle.type} confirmée!`
-      );
+      const reservationID = response.data._id;
+      console.log(reservationID);
+      const amount = parseFloat(selectedVehicle.price.replace(" $CA", ""));
+
+      // Redirige a la pantalla de opciones de pago
+      navigation.navigate("PaymentOptions", { reservationID, amount });
     } catch (error) {
       console.error("Erreur lors de la réservation:", error);
       Alert.alert("Erreur", "Erreur lors de la création de la réservation.");

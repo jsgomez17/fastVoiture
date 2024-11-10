@@ -6,11 +6,11 @@ const voitureSchema = new mongoose.Schema({
   capacity: Number,
   base_price: {
     type: mongoose.Schema.Types.Decimal128,
-    required: true,
+    required: [true, "Price is required"],
   },
   per_km_rate: {
     type: mongoose.Schema.Types.Decimal128,
-    required: true,
+    required: [true, "Rate is required"],
   },
   eta: String,
   image: String,

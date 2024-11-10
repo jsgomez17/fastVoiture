@@ -1,19 +1,39 @@
-const express = require("express");
+//Internal imports
+const User = require("../models/User");
+const authUtils = require("../utils/auth.utils");
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const User = require("../models/User"); // Importa el modelo de usuario
 
-const router = express.Router();
+exports.getAllUsers = async (req, res) => {
+  try {
+    // Verificar la autenticación
+    const isTokenValid = authUtils.protect(req);
+
+    if (isTokenValid === false) {
+      return res.status(401)
+        .send(`401 Unauthorized : Si l'ulisateur n'est pas authentifié ou si le token est
+        invalide`);
+    }
+    // Obtener la lista de usuarios registrados
+    const user = await User.find().select(
+      "nom prenom telephone email password role"
+    );
+    return res.send(user);
+  } catch (error) {
+    return res.status(500).send(`Une erreur s'est user` + error);
+  }
+};
 
 // Ruta para registrar un usuario
-router.post("/register", async (req, res) => {
+exports.register = async (req, res) => {
   const { nom, prenom, telephone, email, password, role } = req.body;
 
   try {
     // Verificar si el usuario ya existe
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ message: "El usuario ya existe" });
+      return res
+        .status(400)
+        .json({ message: "l'utilisateur est déjà enregistré" });
     }
 
     // Encriptar la contraseña
@@ -28,15 +48,15 @@ router.post("/register", async (req, res) => {
       role,
     });
 
-    const savedUser = await newUser.save();
-    res.status(201).json(savedUser);
+    User.create(newUser);
+    res.status(201).json("utilisateur enregistré");
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
-});
+};
 
 // Autenticación y Generación de Token JWT
-router.post("/login", async (req, res) => {
+exports.login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
@@ -67,20 +87,20 @@ router.post("/login", async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-});
+};
 
 // Endpoint para buscar un usuario por email
-router.get("/getUserByEmail", async (req, res) => {
-  const { email } = req.query; // Obtener el email de la query
-
+exports.getUserByEmail = async (req, res) => {
+  const email = req.params.email; // Obtener el email de la query
+  console.log(`searching email : ${email}`);
   try {
-    const user = await User.findOne({ email }); // Buscar el usuario en la base de datos
+    const filter = { email: email };
+    const user = await User.findOne(filter); // Buscar el usuario en la base de datos
     if (!user) {
-      return res.status(404).json({ message: "Utilisateur introuvable" }); // Si no se encuentra, retornar 404
+      return res.status(404).send("Utilisateur introuvable"); // Si no se encuentra, retornar 404
     }
-    res.status(200).json({ user }); // Retornar el usuario encontrado
+    res.status(200).send(user); // Retornar el usuario encontrado
   } catch (error) {
-    res.status(500).json({ message: error.message }); // Manejar errores
+    res.status(500).send(error.message); // Manejar errores
   }
-});
-module.exports = router;
+};
