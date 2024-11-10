@@ -7,6 +7,7 @@ const os = require("os"); // Importa el módulo os para saber el ip de localhost
 const usersRoutes = require("./routes/users.routes");
 const voituresRoutes = require("./routes/voitures.routes");
 const reservationRoutes = require("./routes/reservations.routes");
+const paypalRoutes = require("./routes/paypal.routes"); // Importa las rutas de PayPal
 
 //Variables
 const app = express();
@@ -45,6 +46,7 @@ app.use(express.json());
 app.use("/users", usersRoutes);
 app.use("/voitures", voituresRoutes);
 app.use("/reservations", reservationRoutes);
+app.use("/paypal", paypalRoutes);
 
 //Listener
 app.listen(PORT, () => {

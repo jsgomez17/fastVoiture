@@ -57,3 +57,50 @@ exports.reserver = async (req, res) => {
       .json({ error: "Erreur lors de la création de la réservation" });
   }
 };
+
+// Controlador para actualizar el estado de la reserva
+exports.updateStatus = async (req, res) => {
+  const { reservationId, status } = req.body; // Obtén el ID de la reserva y el nuevo estado del cuerpo de la solicitud
+
+  try {
+    // Actualiza el estado de la reserva
+    const updatedReservation = await Reservation.findByIdAndUpdate(
+      reservationId,
+      { estado: status },
+      { new: true } // Esto devuelve el documento actualizado
+    );
+
+    if (!updatedReservation) {
+      return res.status(404).json({ message: "Reserva no encontrada" });
+    }
+
+    res.json({
+      message: "Estado de la reserva actualizado",
+      updatedReservation,
+    });
+  } catch (error) {
+    console.error("Error al actualizar el estado de la reserva:", error);
+    res
+      .status(500)
+      .json({ message: "Error al actualizar el estado de la reserva" });
+  }
+};
+
+exports.getReservationDetails = async (req, res) => {
+  const { reservationId } = req.params;
+  try {
+    const reservation = await Reservation.findById(reservationId);
+    if (!reservation) {
+      return res.status(404).json({ message: "Réservation introuvable" });
+    }
+    res.json(reservation);
+  } catch (error) {
+    console.error(
+      "Erreur lors de l'obtention des détails de la réservation:",
+      error
+    );
+    res.status(500).json({
+      message: "Erreur lors de l'obtention des détails de la réservation",
+    });
+  }
+};

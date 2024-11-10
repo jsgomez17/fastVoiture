@@ -17,7 +17,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import axios from "axios";
 import { API_IP } from "../config";
 
-const DestinationSelection = ({ route }) => {
+const DestinationSelection = ({ route, navigation }) => {
   const [departAddress, setDepartAddress] = useState("Emplacement actuel");
   const [destinationAddress, setDestinationAddress] = useState("");
   const [departCoords, setDepartCoords] = useState(null);
@@ -158,10 +158,12 @@ const DestinationSelection = ({ route }) => {
         `${API_IP}/reservations/reserver`,
         reservationData
       );
-      Alert.alert(
-        "Réservation confirmée",
-        `Réservation pour le véhicule ${selectedVehicle.type} confirmée!`
-      );
+      const reservationID = response.data._id;
+      console.log(reservationID);
+      const amount = parseFloat(selectedVehicle.price.replace(" $CA", ""));
+
+      // Redirige a la pantalla de opciones de pago
+      navigation.navigate("PaymentOptions", { reservationID, amount });
     } catch (error) {
       console.error("Erreur lors de la réservation:", error);
       Alert.alert("Erreur", "Erreur lors de la création de la réservation.");

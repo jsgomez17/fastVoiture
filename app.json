@@ -1,5 +1,6 @@
 {
   "expo": {
+    "scheme": "myapp",
     "name": "fastVoiture",
     "slug": "fastVoiture",
     "version": "1.0.0",

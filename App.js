@@ -7,6 +7,8 @@ import SignupScreen from "./screens/SignupScreen"; // Pantalla de inscripción
 import Reservation from "./screens/Reservation"; // Pantalla de Reservation
 import DestinationSelection from "./screens/DestinationSelection"; // Pantalla de direcciones
 import ReservationLater from "./screens/ReservationLater"; // Pantalla de reservacion mas tarde
+import PaymentOptions from "./screens/PaymentOptions"; // Pantalla de pagos
+import ReservationSuccess from "./screens/ReservationSuccess"; //pagina de resumen de la reserva
 
 const Stack = createStackNavigator();
 
@@ -38,6 +40,16 @@ export default function App() {
           name="DestinationSelection"
           component={DestinationSelection}
           options={{ title: "Destination Selection" }}
+        />
+        <Stack.Screen
+          name="PaymentOptions"
+          component={PaymentOptions}
+          options={{ title: "Paiements" }}
+        />
+        <Stack.Screen
+          name="ReservationSuccess"
+          component={ReservationSuccess}
+          options={{ title: "Confirmation de paiement" }}
         />
         <Stack.Screen
           name="ReservationLater"
