@@ -9,6 +9,7 @@ import DestinationSelection from "./screens/DestinationSelection"; // Pantalla d
 import ReservationLater from "./screens/ReservationLater"; // Pantalla de reservacion mas tarde
 import PaymentOptions from "./screens/PaymentOptions"; // Pantalla de pagos
 import ReservationSuccess from "./screens/ReservationSuccess"; //pagina de resumen de la reserva
+import UserModificationScreen from "./screens/UserModificationScreen"; // Pantalla de modificación de usuario
 
 const Stack = createStackNavigator();
 
@@ -55,6 +56,11 @@ export default function App() {
           name="ReservationLater"
           component={ReservationLater}
           options={{ title: "Réservation plus tard" }}
+        />
+        <Stack.Screen
+          name="UserModificationScreen"
+          component={UserModificationScreen}
+          options={{ title: "Modifier l'utilisateur" }}
         />
       </Stack.Navigator>
     </NavigationContainer>

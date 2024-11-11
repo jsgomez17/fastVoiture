@@ -11,6 +11,8 @@ const userSchema = new mongoose.Schema({
     enum: ["passenger", "driver"],
     required: [true, "The role is required"],
   }, // Campo para almacenar el rol
+  facialId: { type: String }, // Campo para almacenar el ID facial
+  voiceData: { type: String }, // Campo para almacenar datos de voz
 });
 
 // Exportar el modelo

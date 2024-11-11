@@ -6,7 +6,7 @@ exports.protect = (req) => {
     //Recuperer le token
     let token = req.headers.authorization;
 
-    //console.log(req.headers.authorization);
+    console.log(req.headers.authorization);
     //Valide que le token est de type Bearer
     if (!token.startsWith("Bearer")) {
       return false;
@@ -15,7 +15,7 @@ exports.protect = (req) => {
     token = token.split(" ")[1];
     console.log(token);
     //Decoded token
-    const decodedToken = jwt.decode(token, "FastVoiture2024");
+    const decodedToken = jwt.verify(token, "FastVoiture2024");
 
     req.userId = decodedToken._id;
 

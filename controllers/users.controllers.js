@@ -104,3 +104,101 @@ exports.getUserByEmail = async (req, res) => {
     res.status(500).send(error.message); // Manejar errores
   }
 };
+
+// Función para modificar un usuario
+exports.updateUser = async (req, res) => {
+  const userId = req.params.id; // Obtener el ID del usuario de los parámetros de la ruta
+  const { nom, prenom, telephone, email, role, facialId, voiceData } = req.body; // Obtener los datos del cuerpo de la solicitud
+
+  try {
+    // Verificar la autenticación (si es necesario)
+    // const isTokenValid = authUtils.protect(req);
+    // if (isTokenValid === false) {
+    //   return res
+    //     .status(401)
+    //     .send(
+    //       `401 Non autorisé : jeton invalide ou utilisateur non authentifié`
+    //     );
+    // }
+
+    // Buscar el usuario por ID
+    const user = await User.findOne(userId);
+    if (!user) {
+      return res.status(404).send("Utilisateur introuvable"); // Si no se encuentra, retornar 404
+    }
+
+    // Actualizar los campos del usuario
+    user.nom = nom || user.nom; // Si no se proporciona un nuevo valor, mantener el actual
+    user.prenom = prenom || user.prenom;
+    user.telephone = telephone || user.telephone;
+    user.email = email || user.email; // Ten en cuenta que si cambias el email, debes asegurarte de que no exista otro usuario con ese email
+    user.role = role || user.role;
+    user.facialId = facialId || user.facialId; // Actualizar el ID facial
+    user.voiceData = voiceData || user.voiceData; // Actualizar los datos de voz
+
+    // Guardar los cambios en la base de datos
+    await user.save();
+
+    res.status(200).json({ message: "Utilisateur modifié avec succès", user });
+  } catch (error) {
+    res
+      .status(500)
+      .send(
+        `Une erreur s'est produite lors de la mise à jour de l'utilisateur: ${error.message}`
+      );
+  }
+};
+
+// Función para registrar reconocimiento facial
+exports.registerFace = async (req, res) => {
+  const { email, facialId } = req.body; // Obtener el email y el ID facial del cuerpo de la solicitud
+
+  try {
+    // Verificar si el usuario existe
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).send("Utilisateur introuvable");
+    }
+
+    // Actualizar el ID facial del usuario
+    user.facialId = facialId;
+    await user.save();
+
+    res
+      .status(200)
+      .json({ message: "Reconocimiento facial registrado con éxito", user });
+  } catch (error) {
+    res
+      .status(500)
+      .send(
+        `Une erreur s'est produite lors de l'enregistrement du visage: ${error.message}`
+      );
+  }
+};
+
+// Función para registrar reconocimiento vocal
+exports.registerVoice = async (req, res) => {
+  const { email, voiceData } = req.body; // Obtener el email y los datos de voz del cuerpo de la solicitud
+
+  try {
+    // Verificar si el usuario existe
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).send("Utilisateur introuvable");
+    }
+
+    // Actualizar los datos de voz del usuario
+    user.voiceData = voiceData;
+    await user.save();
+
+    res
+      .status(200)
+      .json({ message: "Reconocimiento vocal registrado con éxito", user });
+  } catch (error) {
+    res
+      .status(500)
+      .send(
+        `Une erreur s'est produite lors de l'enregistrement de la voix: ${error.message}`
+      );
+  }
+};
