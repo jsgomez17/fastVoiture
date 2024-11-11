@@ -1,9 +1,31 @@
-const express = require("express");
+//Internal imports
 const Voiture = require("../models/Voiture");
+const authUtils = require("../utils/auth.utils");
 const Configuracion = require("../models/Configuration");
-const router = express.Router();
+const bcrypt = require("bcryptjs");
 
-router.post("/calculer-prix", async (req, res) => {
+exports.getAllVoitures = async (req, res) => {
+  try {
+    // Verificar la autenticación
+    const isTokenValid = authUtils.protect(req);
+
+    if (isTokenValid === false) {
+      return res.status(401)
+        .send(`401 Unauthorized : Si l'ulisateur n'est pas authentifié ou si le token est
+        invalide`);
+    }
+    // Obtener la lista de usuarios registrados
+    const voiture = await Voiture.find().select(
+      "capacity base_price per_km_rate"
+    );
+    return res.send(voiture);
+  } catch (error) {
+    return res.status(500).send(`Une erreur s'est voiture` + error);
+  }
+};
+
+// Ruta para actulizar precios
+exports.calculPrix = async (req, res) => {
   const { distance } = req.body;
 
   try {
@@ -15,7 +37,7 @@ router.post("/calculer-prix", async (req, res) => {
       !configuration ||
       isNaN(Number(configuration.base_value))
     ) {
-      return res.status(404).json({
+      return res.status(404).send({
         error:
           "Vehicules ou configuration non trouvés ou base_value non valide",
       });
@@ -45,8 +67,6 @@ router.post("/calculer-prix", async (req, res) => {
       "Erreur lors du calcul du prix pour tous les véhicules:",
       error
     );
-    res.status(500).json({ error: "Erreur lors du calcul du prix" });
+    res.status(500).send("Erreur lors du calcul du prix");
   }
-});
-
-module.exports = router;
+};

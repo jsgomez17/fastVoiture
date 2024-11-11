@@ -9,7 +9,7 @@ import {
   Image,
   Alert,
 } from "react-native";
-import * as LocalAuthentication from "expo-local-authentication"; // Importamos el módulo
+import * as LocalAuthentication from "expo-local-authentication"; // Importamos el módulos de reconocimiento
 import { Formik } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
@@ -36,7 +36,7 @@ const LoginScreen = ({ navigation }) => {
 
   const handleLogin = async (values) => {
     try {
-      const response = await axios.post(`${API_IP}/api/users/login`, {
+      const response = await axios.post(`${API_IP}/users/login/`, {
         email: values.email,
         password: values.password,
         role,
@@ -84,11 +84,8 @@ const LoginScreen = ({ navigation }) => {
           return;
         }
         console.log("Buscando usuario con email:", email); // Verificar que `email` no esté vacío
-        const response = await axios.get(
-          `${API_IP}/api/users/getUserByEmail?email=${email}`
-        );
-
-        const { nom, prenom } = response.data.user;
+        const response = await axios.get(`${API_IP}/users/${email}`);
+        const { nom, prenom } = response.data;
         console.log("Datos del usuario:", nom, prenom, email);
 
         // Navega a la pantalla de reserva pasando nom y prenom
@@ -260,6 +257,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   biometricText: {
+    color: "white",
+    fontWeight: "bold",
+  },
+  faceRecognitionButton: {
+    marginTop: 20,
+    backgroundColor: "blue",
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
+  },
+  faceRecognitionText: {
     color: "white",
     fontWeight: "bold",
   },

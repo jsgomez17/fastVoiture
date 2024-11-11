@@ -39,7 +39,7 @@ const SignupScreen = ({ navigation }) => {
 
   const handleSignup = async (values, { resetForm }) => {
     try {
-      const response = await axios.post(`${API_IP}/api/users/register`, {
+      const response = await axios.post(`${API_IP}/users/register/`, {
         ...values,
         role,
       });
