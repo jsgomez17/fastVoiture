@@ -9,29 +9,34 @@ import {
   Image,
   Alert,
 } from "react-native";
-import * as LocalAuthentication from "expo-local-authentication"; // Importamos el módulos de reconocimiento
+import { Camera } from "expo-camera"; // Importer la caméra
+import * as LocalAuthentication from "expo-local-authentication";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 import { API_IP } from "../config";
 
-// Esquema de validación de Yup para el formulario de login
 const LoginSchema = Yup.object().shape({
   email: Yup.string().email("Email invalide").required("L'email est requis"),
   password: Yup.string().min(6, "Doit contenir au moins 6 caractères"),
 });
 
 const LoginScreen = ({ navigation }) => {
-  const [role, setRole] = useState("passenger"); // Por defecto 'passenger'
+  const [role, setRole] = useState("passenger");
   const [isBiometricSupported, setIsBiometricSupported] = useState(false);
+  const [cameraPermission, setCameraPermission] = useState(false);
+  const [isCameraVisible, setIsCameraVisible] = useState(false);
+  const [cameraRef, setCameraRef] = useState(null);
 
-  // Verificar si el dispositivo soporta biometría
   useEffect(() => {
-    const checkBiometricSupport = async () => {
+    const checkPermissions = async () => {
       const compatible = await LocalAuthentication.hasHardwareAsync();
       setIsBiometricSupported(compatible);
+
+      const { status } = await Camera.requestCameraPermissionsAsync();
+      setCameraPermission(status === "granted");
     };
-    checkBiometricSupport();
+    checkPermissions();
   }, []);
 
   const handleLogin = async (values) => {
@@ -41,80 +46,62 @@ const LoginScreen = ({ navigation }) => {
         password: values.password,
         role,
       });
-      console.log("Connexion réussie:", response.data);
-
       const { nom, prenom, email } = response.data;
-
-      // Aquí redirigimos a la pantalla de reserva y enviamos nom y prenom
-      navigation.navigate("Reservation", {
-        nom,
-        prenom,
-        email,
-      });
+      navigation.navigate("Reservation", { nom, prenom, email });
     } catch (error) {
-      console.log("Erreur lors de la connexion:", error);
-      // Manejo de errores específicos
       if (error.response) {
-        if (error.response.status === 404) {
-          Alert.alert(
-            "Erreur",
-            "L'utilisateur n'existe pas, veuillez vous inscrire."
-          );
-        } else {
-          Alert.alert("Erreur", error.response.data.message);
-        }
+        Alert.alert(
+          "Erreur",
+          error.response.status === 404
+            ? "L'utilisateur n'existe pas, veuillez vous inscrire."
+            : error.response.data.message
+        );
       } else {
         Alert.alert("Erreur", "Échec de la connexion");
       }
     }
   };
 
-  // Función para manejar la autenticación biométrica (huella)
-  const handleBiometricAuth = async (email) => {
-    const biometricAuth = await LocalAuthentication.authenticateAsync({
-      promptMessage: "Connectez-vous avec votre empreinte digitale",
-      fallbackLabel: "Utiliser le mot de passe",
-    });
+  const handleFaceRecognition = async () => {
+    if (!cameraPermission) {
+      Alert.alert("Permission requise", "Activez l'accès à la caméra.");
+      return;
+    }
 
-    if (biometricAuth.success) {
-      // Si la autenticación es exitosa, busca al usuario en la base de datos
+    setIsCameraVisible(true);
+  };
+
+  const captureAndVerifyFace = async () => {
+    if (cameraRef) {
+      const photo = await cameraRef.takePictureAsync({ base64: true });
+      setIsCameraVisible(false);
+
       try {
-        if (!email) {
-          Alert.alert("Erreur", "Veuillez d'abord entrer votre email.");
-          return;
-        }
-        console.log("Buscando usuario con email:", email); // Verificar que `email` no esté vacío
-        const response = await axios.get(`${API_IP}/users/${email}`);
-        const { nom, prenom } = response.data;
-        console.log("Datos del usuario:", nom, prenom, email);
-
-        // Navega a la pantalla de reserva pasando nom y prenom
-        navigation.navigate("Reservation", {
-          nom,
-          prenom,
-          email,
+        // Remplacez cela par votre API ou modèle de reconnaissance faciale
+        const response = await axios.post(`${API_IP}/face-recognition`, {
+          image: photo.base64,
         });
+
+        if (response.data.success) {
+          const { nom, prenom, email } = response.data.user;
+          navigation.navigate("Reservation", { nom, prenom, email });
+        } else {
+          Alert.alert("Erreur", "Reconnaissance faciale échouée");
+        }
       } catch (error) {
-        Alert.alert("Erreur", "Utilisateur non trouvé");
-        console.log("Erreur lors de la récupération de l'utilisateur:", error);
+        Alert.alert("Erreur", "Erreur lors de la reconnaissance faciale");
       }
-    } else {
-      Alert.alert("Erreur", "Échec de l'authentification biométrique");
     }
   };
 
   return (
     <Formik
-      initialValues={{
-        email: "",
-        password: "",
-      }}
+      initialValues={{ email: "", password: "" }}
       validationSchema={LoginSchema}
-      onSubmit={(values) => handleLogin(values)} // Pass the values to handleLogin
+      onSubmit={(values) => handleLogin(values)}
     >
       {({ handleChange, handleBlur, handleSubmit, values, errors }) => (
         <View style={styles.container}>
-          {/* Logo y título */}
           <View style={styles.headerContainer}>
             <Image
               source={require("../public/assets/logoFastVoiture.png")}
@@ -123,7 +110,6 @@ const LoginScreen = ({ navigation }) => {
             <Text style={styles.title}>Connecter</Text>
           </View>
 
-          {/* Radio Button para Pasajero o Conductor */}
           <View style={styles.radioContainer}>
             <TouchableOpacity
               onPress={() => setRole("passenger")}
@@ -149,7 +135,6 @@ const LoginScreen = ({ navigation }) => {
             </TouchableOpacity>
           </View>
 
-          {/* Formulario de correo y contraseña */}
           <Text>E-mail</Text>
           <TextInput
             style={styles.input}
@@ -173,103 +158,42 @@ const LoginScreen = ({ navigation }) => {
 
           <Button onPress={handleSubmit} title="Se connecter" />
 
-          {/* Botón de autenticación con huella dactilar */}
           {isBiometricSupported && (
             <TouchableOpacity
               style={styles.biometricButton}
-              onPress={() => handleBiometricAuth(values.email)} // Pasar el email aquí
+              onPress={() => handleFaceRecognition()}
             >
               <Text style={styles.biometricText}>
-                Connectez-vous avec votre empreinte digitale
+                Connectez-vous avec la reconnaissance faciale
               </Text>
             </TouchableOpacity>
           )}
 
-          {/* Enlace a la página de inscripción */}
           <TouchableOpacity onPress={() => navigation.navigate("SignupScreen")}>
             <Text style={styles.loginText}>
               Vous n'avez pas de compte ? S'inscrire
             </Text>
           </TouchableOpacity>
+
+          {isCameraVisible && (
+            <Camera
+              style={styles.camera}
+              ref={(ref) => setCameraRef(ref)}
+              onCameraReady={captureAndVerifyFace}
+            />
+          )}
         </View>
       )}
     </Formik>
   );
 };
 
-// Estilos
 const styles = StyleSheet.create({
-  container: {
+  // Styles ici...
+  camera: {
     flex: 1,
-    padding: 16,
-    backgroundColor: "#fff",
-  },
-  headerContainer: {
-    flexDirection: "row", // Hace que los elementos estén en la misma línea
-    alignItems: "center", // Centra verticalmente
-    justifyContent: "center", // Centra horizontalmente
-  },
-  logo: {
-    width: 70,
-    height: 70,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    textAlign: "center",
-  },
-  input: {
-    height: 40,
-    borderColor: "gray",
-    borderWidth: 1,
-    marginBottom: 10,
-  },
-  radioContainer: {
-    flexDirection: "row",
     justifyContent: "center",
-    marginBottom: 20,
-  },
-  radioButton: {
-    marginHorizontal: 10,
-  },
-  radio: {
-    fontSize: 18,
-    color: "gray",
-  },
-  radioSelected: {
-    fontSize: 18,
-    color: "blue",
-    fontWeight: "bold",
-  },
-  error: {
-    color: "red",
-  },
-  loginText: {
-    marginTop: 20,
-    color: "blue",
-    textAlign: "center",
-  },
-  biometricButton: {
-    marginTop: 20,
-    backgroundColor: "blue",
-    padding: 10,
-    borderRadius: 5,
     alignItems: "center",
-  },
-  biometricText: {
-    color: "white",
-    fontWeight: "bold",
-  },
-  faceRecognitionButton: {
-    marginTop: 20,
-    backgroundColor: "blue",
-    padding: 10,
-    borderRadius: 5,
-    alignItems: "center",
-  },
-  faceRecognitionText: {
-    color: "white",
-    fontWeight: "bold",
   },
 });
 
