@@ -15,6 +15,7 @@
     "axios": "^1.7.7",
     "bcryptjs": "^2.4.3",
     "expo": "^51.0.39",
+    "expo-camera": "~15.0.16",
     "expo-linking": "~6.3.1",
     "expo-local-authentication": "~14.0.1",
     "expo-location": "^17.0.1",
@@ -24,11 +25,15 @@
     "jsonwebtoken": "^9.0.2",
     "lottie-react-native": "^6.7.0",
     "mongoose": "^8.7.1",
+    "nodemon": "^3.1.7",
     "react": "18.2.0",
     "react-native": "0.74.5",
     "react-native-maps": "^1.14.0",
     "react-native-modal-datetime-picker": "^18.0.0",
+    "react-native-vision-camera": "^4.6.1",
     "react-native-webview": "13.8.6",
+    "react-native-worklets-core": "^1.5.0",
+    "vision-camera-trustee-face-detector-v3": "^1.5.1",
     "yup": "^1.4.0"
   },
   "devDependencies": {

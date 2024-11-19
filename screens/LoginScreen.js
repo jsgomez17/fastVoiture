@@ -179,9 +179,10 @@ const LoginScreen = ({ navigation }) => {
               style={styles.biometricButton}
               onPress={() => handleBiometricAuth(values.email)} // Pasar el email aquí
             >
-              <Text style={styles.biometricText}>
-                Connectez-vous avec votre empreinte digitale
-              </Text>
+              <Image
+                source={require("../public/assets/fingerprint.png")}
+                style={styles.logo}
+              />
             </TouchableOpacity>
           )}
 
@@ -251,23 +252,12 @@ const styles = StyleSheet.create({
   },
   biometricButton: {
     marginTop: 20,
-    backgroundColor: "blue",
-    padding: 10,
+    backgroundColor: "white",
+    padding: 2,
     borderRadius: 5,
     alignItems: "center",
   },
   biometricText: {
-    color: "white",
-    fontWeight: "bold",
-  },
-  faceRecognitionButton: {
-    marginTop: 20,
-    backgroundColor: "blue",
-    padding: 10,
-    borderRadius: 5,
-    alignItems: "center",
-  },
-  faceRecognitionText: {
     color: "white",
     fontWeight: "bold",
   },

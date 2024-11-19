@@ -1,6 +1,14 @@
 //External imports
 import React, { useState } from "react";
-import { View, Text, TextInput, Button, Alert, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  Alert,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 import axios from "axios"; // Asegúrate de tener axios instalado
 import { API_IP } from "../config";
 
@@ -45,23 +53,7 @@ const UserModificationScreen = ({ route, navigation }) => {
     }
   };
 
-  const handleRegisterFace = async () => {
-    try {
-      // Lógica para registrar el reconocimiento vocal
-      const response = await axios.post(`${API_IP}/users/registerFace`, {
-        email,
-        facialId,
-      });
-
-      Alert.alert("Succès", response.data.message);
-      navigation.goBack();
-    } catch (error) {
-      Alert.alert(
-        "Error",
-        error.response ? error.response.data : `Error desconocido ${error}`
-      );
-    }
-  };
+  
 
   const handleRegisterVoice = async () => {
     try {
@@ -83,7 +75,7 @@ const UserModificationScreen = ({ route, navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Modificar Usuario</Text>
+      <Text style={styles.title}>Modifier l'utilisateur</Text>
 
       <TextInput
         style={styles.input}
@@ -131,7 +123,7 @@ const UserModificationScreen = ({ route, navigation }) => {
       />
       <TextInput
         style={styles.input}
-        placeholder="Datos de Voz"
+        placeholder="ID Voix"
         value={voiceData}
         onChangeText={setVoiceData}
       />
@@ -141,7 +133,12 @@ const UserModificationScreen = ({ route, navigation }) => {
         onPress={handleUpdateUser}
       />
 
-      <Button title="Enregistrer Face" onPress={handleRegisterFace} />
+      <TouchableOpacity
+        style={styles.biometricButton}
+        onPress={() => handleBiometricAuth(values.email)}
+      >
+        <Text>Enregistrer votre Face</Text>
+      </TouchableOpacity>
 
       <Button title="Enregistrer Voix" onPress={handleRegisterVoice} />
     </View>
@@ -165,6 +162,17 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 15,
     paddingHorizontal: 10,
+  },
+  faceRecognitionButton: {
+    marginTop: 20,
+    backgroundColor: "blue",
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
+  },
+  faceRecognitionText: {
+    color: "white",
+    fontWeight: "bold",
   },
 });
 
