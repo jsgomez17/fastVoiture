@@ -11,6 +11,7 @@ import PaymentOptions from "./screens/PaymentOptions"; // Pantalla de pagos
 import ReservationSuccess from "./screens/ReservationSuccess"; //pagina de resumen de la reserva
 import UserModificationScreen from "./screens/UserModificationScreen"; // Pantalla de modificación de usuario
 import CaptureFaceScreen from "./screens/CaptureFaceScreen";
+import RideTrackingScreen from "./screens/RideTrackingScreen";
 const Stack = createStackNavigator();
 
 export default function App() {
@@ -66,6 +67,11 @@ export default function App() {
           name="CaptureFaceScreen"
           component={CaptureFaceScreen}
           options={{ title: "Capture de Face" }}
+        />
+        <Stack.Screen
+          name="RideTrackingScreen"
+          component={RideTrackingScreen}
+          options={{ title: "Ride Tracking" }}
         />
       </Stack.Navigator>
     </NavigationContainer>

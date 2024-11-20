@@ -3,6 +3,7 @@ import {
   View,
   Text,
   TouchableOpacity,
+  Button,
   Image,
   StyleSheet,
   ScrollView,
@@ -95,12 +96,11 @@ const Reservation = ({ route, navigation }) => {
           </TouchableOpacity>
         </View>
         <View>
-          <TouchableOpacity
+          <Button
             style={styles.button}
             onPress={handleGoToUserModification}
-          >
-            <Text>Modifier</Text>
-          </TouchableOpacity>
+            title="Modifier l'utilisateur"
+          />
         </View>
       </View>
     </ScrollView>

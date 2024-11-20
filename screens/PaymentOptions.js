@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import axios from "axios";
 import { WebView } from "react-native-webview";
-import { API_IP } from "../config";
+import { API_GEO, API_IP } from "../config";
 
 const PaymentOptions = ({ route, navigation }) => {
   const { reservationID, amount } = route.params;
@@ -20,6 +20,45 @@ const PaymentOptions = ({ route, navigation }) => {
   const [paypalUrl, setPaypalUrl] = useState("");
   const [orderId, setOrderId] = useState("");
 
+  const onSubmit = async (data) => {
+    if (data != null) {
+      const dataInfo = {
+        origin: data.origin,
+        destination: data.destination,
+      };
+
+      try {
+        const response = await fetch(`${API_GEO}/getitenary`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(dataInfo),
+        });
+
+        const responseData = await response.json();
+        console.log("Received data:", responseData);
+
+        // Set the location state with the response data
+        setLocation({
+          dest: {
+            latitude: responseData.destination.latitude,
+            longitude: responseData.destination.longitude,
+          },
+          info: {
+            distance: responseData.info.distance,
+            temps: responseData.info.temps,
+          },
+          ori: {
+            latitude: responseData.origin.latitude,
+            longitude: responseData.origin.longitude,
+          },
+        });
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    }
+  };
   const updateReservationStatus = async (status) => {
     try {
       await axios.patch(`${API_IP}/reservations/update-status`, {
@@ -27,6 +66,7 @@ const PaymentOptions = ({ route, navigation }) => {
         status: status,
       });
       Alert.alert("Paiement réussi", `Statut de réservation: ${status}`);
+      onSubmit();
       navigation.navigate("ReservationSuccess");
     } catch (error) {
       Alert.alert(

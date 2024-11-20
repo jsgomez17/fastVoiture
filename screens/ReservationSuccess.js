@@ -3,11 +3,26 @@ import {
   View,
   Text,
   StyleSheet,
+  Button,
   TouchableOpacity,
   Image,
   ScrollView,
 } from "react-native";
 import LottieView from "lottie-react-native";
+
+const onPaymentSuccess = (responseData, navigation) => {
+  // Navegar a la pantalla de seguimiento
+  navigation.navigate("RideTrackingScreen", {
+    userLocation: {
+      latitude: responseData.origin.latitude,
+      longitude: responseData.origin.longitude,
+    },
+    driverLocation: {
+      latitude: responseData.destination.latitude, // O la ubicación inicial del conductor
+      longitude: responseData.destination.longitude,
+    },
+  });
+};
 
 const ReservationSuccess = ({ route, navigation }) => {
   const { reservationDetails } = route.params || {}; // Usa || {} para evitar errores si route.params está indefinido
@@ -25,6 +40,18 @@ const ReservationSuccess = ({ route, navigation }) => {
 
   // Almacenamos el email (id_usuario) para pasarlo a la siguiente pantalla
   const email = reservationDetails.id_usuario;
+
+  // Simulación de responseData que deberías obtener después del pago
+  const responseData = {
+    origin: {
+      latitude: reservationDetails.originLatitude, // Asegúrate de que esto exista
+      longitude: reservationDetails.originLongitude, // Asegúrate de que esto exista
+    },
+    destination: {
+      latitude: reservationDetails.destinationLatitude, // Asegúrate de que esto exista
+      longitude: reservationDetails.destinationLongitude, // Asegúrate de que esto exista
+    },
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -75,6 +102,10 @@ const ReservationSuccess = ({ route, navigation }) => {
           <Text style={styles.value}>{reservationDetails.paymentMethod}</Text>
         </View>
 
+        <Button
+          onPress={() => onPaymentSuccess(responseData, navigation)} // Cambié aquí
+          title="Suivi le course"
+        />
         <TouchableOpacity
           style={styles.button}
           onPress={() => navigation.navigate("DestinationSelection", { email })}
