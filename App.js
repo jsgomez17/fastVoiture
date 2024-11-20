@@ -11,7 +11,6 @@ import PaymentOptions from "./screens/PaymentOptions"; // Pantalla de pagos
 import ReservationSuccess from "./screens/ReservationSuccess"; //pagina de resumen de la reserva
 import UserModificationScreen from "./screens/UserModificationScreen"; // Pantalla de modificación de usuario
 import CaptureFaceScreen from "./screens/CaptureFaceScreen";
-
 const Stack = createStackNavigator();
 
 export default function App() {

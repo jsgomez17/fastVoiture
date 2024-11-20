@@ -32,7 +32,7 @@ const UserModificationScreen = ({ route, navigation }) => {
     try {
       // Lógica para actualizar el usuario
       const response = await axios.put(
-        `${API_IP}/users/update/${email}`, //todo: actualizar direccion api cuando ya este lista
+        `${API_IP}/users/${email}`, //todo: actualizar direccion api cuando ya este lista
         {
           nom,
           prenom,
@@ -52,8 +52,6 @@ const UserModificationScreen = ({ route, navigation }) => {
       );
     }
   };
-
-  
 
   const handleRegisterVoice = async () => {
     try {
@@ -133,12 +131,10 @@ const UserModificationScreen = ({ route, navigation }) => {
         onPress={handleUpdateUser}
       />
 
-      <TouchableOpacity
-        style={styles.biometricButton}
+      <Button
+        title="Enregistrer votre Face"
         onPress={() => handleBiometricAuth(values.email)}
-      >
-        <Text>Enregistrer votre Face</Text>
-      </TouchableOpacity>
+      ></Button>
 
       <Button title="Enregistrer Voix" onPress={handleRegisterVoice} />
     </View>

@@ -28,10 +28,10 @@ const Reservation = ({ route, navigation }) => {
     }); // Navega a la pantalla de selección de dirección
   };
 
-  // Función para navegar a la pantalla de modificación de usuario
+  // Función para navegar a la pantalla de selección de dirección
   const handleGoToUserModification = () => {
     navigation.navigate("UserModificationScreen", {
-      email, // Puedes pasar otros parámetros si lo deseas
+      email, // Paso opcional para pasarlo directamente
     });
   };
 
@@ -94,13 +94,14 @@ const Reservation = ({ route, navigation }) => {
             <Text style={styles.suggestionText}>Réserver</Text>
           </TouchableOpacity>
         </View>
-        {/* Botón para ir a la pantalla de modificación de usuario */}
-        <TouchableOpacity
-          style={styles.modifyUserButton}
-          onPress={handleGoToUserModification}
-        >
-          <Text style={styles.modifyUserext}>Modifier Mon Compte</Text>
-        </TouchableOpacity>
+        <View>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={handleGoToUserModification}
+          >
+            <Text>Modifier</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </ScrollView>
   );
@@ -184,17 +185,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "bold",
   },
-  modifyUserButton: {
-    backgroundColor: "#007BFF",
-    padding: 10,
-    borderRadius: 5,
+  button: {
+    backgroundColor: "#1e90ff",
+    padding: 15,
+    borderRadius: 10,
+    marginTop: 10,
+    width: 200,
     alignItems: "center",
-    marginTop: 20,
-  },
-  modifyUserText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
   },
 });
 
