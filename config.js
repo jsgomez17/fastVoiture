@@ -1,5 +1,3 @@
-// config.js
-export const API_IP = "http://192.168.0.198:3000";
-export const API_GEO = "http://192.168.2.11:8060";
-//export const API_IP = "http://192.168.155.94:3000";
-//export const API_IP = "http://192.168.112.1:3000";
+// config.js - IPs de APIs de backend y receptor de request de pasajero.
+export const API_IP = "http://10.1.10.110:3000"; //actualizar con el IP que indica el backend una vez que se inicia.
+export const API_GEO = "https://location-api-63ti.onrender.com/getitenary";

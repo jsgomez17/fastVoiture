@@ -41,7 +41,6 @@ const DestinationSelection = ({ route, navigation }) => {
         );
         return;
       }
-
       // Obtener la ubicación actual
       const location = await Location.getCurrentPositionAsync({});
       const currentCoords = {
@@ -51,6 +50,40 @@ const DestinationSelection = ({ route, navigation }) => {
       setDepartCoords(currentCoords);
     })();
   }, []);
+
+  // Handle form submission
+  const handleSubmit = async () => {
+    const data = {
+      username: "Christian",
+      origin: departAddress,
+      destination: destinationAddress,
+    };
+    console.log(data);
+
+    try {
+      // Send POST request to the FastAPI server
+      const res = await fetch(
+        "https://location-api-63ti.onrender.com/getitenary",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json", // Specify the content type as JSON
+          },
+          body: JSON.stringify(data), // Send data as JSON
+        }
+      );
+
+      if (!res.ok) {
+        throw new Error("Failed to fetch response");
+      }
+
+      // Parse the JSON response
+      const result = await res.json();
+      setResponse(`Response from server: ${JSON.stringify(result)}`);
+    } catch (error) {
+      setResponse(`Error: ${error.message}`);
+    }
+  };
 
   // Función para obtener sugerencias de direcciones
   const handleSearchSuggestions = async (text) => {
@@ -136,6 +169,7 @@ const DestinationSelection = ({ route, navigation }) => {
 
   // Función para manejar la reserva
   const handleReserve = async () => {
+    handleSubmit();
     if (!selectedVehicle) {
       Alert.alert("Erreur", "Veuillez sélectionner un type de véhicule.");
       return;
