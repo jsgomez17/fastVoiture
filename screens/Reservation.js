@@ -10,10 +10,14 @@ import {
 } from "react-native";
 import LottieView from "lottie-react-native"; // Importa Lottie para la animación
 import { Ionicons } from "@expo/vector-icons";
+import { USERNAME } from "../config";
 
 const Reservation = ({ route, navigation }) => {
+  console.log(route);
   // Extraemos los datos pasados desde la pantalla de inicio de sesión
   const { nom, prenom, email } = route.params;
+  USERNAME = prenom;
+  console.log(USERNAME);
 
   // Función para navegar a la pantalla de selección de dirección
   const handleGoToDestinationScreen = () => {
@@ -50,7 +54,7 @@ const Reservation = ({ route, navigation }) => {
 
         {/* Texto de bienvenida debajo del logo y título */}
         <Text style={styles.welcomeText}>
-          Bienvenue, {nom} {prenom}
+          Bienvenue, {prenom} {nom}
         </Text>
 
         {/* Animación en la parte superior */}

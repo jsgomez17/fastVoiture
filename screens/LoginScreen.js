@@ -83,10 +83,10 @@ const LoginScreen = ({ navigation }) => {
           Alert.alert("Erreur", "Veuillez d'abord entrer votre email.");
           return;
         }
-        console.log("Buscando usuario con email:", email); // Verificar que `email` no esté vacío
+        console.log("Recherche d'un utilisateur avec son email :", email); // Verificar que `email` no esté vacío
         const response = await axios.get(`${API_IP}/users/${email}`);
         const { nom, prenom } = response.data;
-        console.log("Datos del usuario:", nom, prenom, email);
+        console.log("Données de l'utilisateur:", nom, prenom, email);
 
         // Navega a la pantalla de reserva pasando nom y prenom
         navigation.navigate("Reservation", {

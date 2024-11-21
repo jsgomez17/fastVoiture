@@ -42,7 +42,6 @@ const UserModificationScreen = ({ route, navigation }) => {
           voiceData,
         }
       );
-
       Alert.alert("Succès", response.data.message);
       navigation.goBack();
     } catch (error) {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 
 const RideTrackingScreen = ({ route }) => {
@@ -10,62 +10,115 @@ const RideTrackingScreen = ({ route }) => {
     driver: driverLocation,
   });
 
-  useEffect(() => {
-    const updateDriverLocation = (newDriverLocation) => {
-      setLocation((prevState) => ({
-        ...prevState,
-        driver: newDriverLocation,
-      }));
-    };
-
-    // Aquí deberías agregar la lógica para recibir actualizaciones de la ubicación del conductor
-    // Por ejemplo, usando WebSocket o algún otro método para recibir la ubicación en tiempo real
-
-    // Simulación de actualización de ubicación del conductor (reemplaza esto con tu lógica)
-    const interval = setInterval(() => {
-      const newDriverLocation = {
-        latitude: location.driver.latitude + 0.0001, // Simulación de movimiento
-        longitude: location.driver.longitude + 0.0001,
-      };
-      updateDriverLocation(newDriverLocation);
-    }, 5000); // Actualiza cada 5 segundos
-
-    return () => clearInterval(interval); // Limpieza del intervalo al desmontar el componente
-  }, [location.driver]);
-
   return (
-    <View style={styles.container}>
-      <MapView
-        style={styles.map}
-        initialRegion={{
-          latitude: location.user.latitude,
-          longitude: location.user.longitude,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01,
-        }}
-      >
-        <Marker
-          coordinate={location.user}
-          title="Tu ubicación"
-          description="Aquí estás tú"
-        />
-        <Marker
-          coordinate={location.driver}
-          title="Ubicación del conductor"
-          description="Aquí está tu conductor"
-        />
-      </MapView>
-    </View>
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <View style={styles.container}>
+        <View style={styles.headerContainer}>
+          <Image
+            source={require("../public/assets/logoFastVoiture.png")}
+            style={styles.logo}
+          />
+          <Text style={styles.title}>Paiement</Text>
+        </View>
+        <Text style={styles.label}>Sélectionnez un mode de paiement:</Text>
+
+        <TouchableOpacity
+          style={[
+            styles.paymentButton,
+            selectedPaymentMethod === "cash" && styles.selectedButton,
+          ]}
+          onPress={() => {
+            setSelectedPaymentMethod("cash");
+            handleCashPayment();
+          }}
+        >
+          <Text style={styles.paymentText}>Espèces</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.paymentButton,
+            selectedPaymentMethod === "paypal" && styles.selectedButton,
+          ]}
+          onPress={handlePayPalPayment}
+        >
+          <Text style={styles.paymentText}>PayPal</Text>
+        </TouchableOpacity>
+
+        {showWebView && (
+          <Modal visible={showWebView} transparent animationType="slide">
+            <WebView
+              source={{ uri: paypalUrl }}
+              onNavigationStateChange={(navState) => {
+                if (navState.url.includes("/paypal/success")) {
+                  setShowWebView(false);
+                  capturePayPalOrder(); // Captura la orden
+                } else if (navState.url.includes("/paypal/cancel")) {
+                  setShowWebView(false);
+                  Alert.alert(
+                    "Paiement annulé",
+                    "L'utilisateur a annulé le paiement."
+                  );
+                }
+              }}
+              onError={() => {
+                setShowWebView(false);
+                Alert.alert(
+                  "Erreur",
+                  "Il y a eu un problème avec le paiement."
+                );
+              }}
+            />
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setShowWebView(false)}
+            >
+              <Text style={styles.closeButtonText}>Fermer</Text>
+            </TouchableOpacity>
+          </Modal>
+        )}
+      </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  scrollContainer: { flexGrow: 1 },
+  container: { flex: 1, padding: 16, backgroundColor: "#fff" },
+  headerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 20,
   },
-  map: {
-    flex: 1,
+  logo: { width: 75, height: 75, marginRight: 10 },
+  title: { fontSize: 24, fontWeight: "bold", textAlign: "center" },
+  label: {
+    fontSize: 18,
+    alignSelf: "flex-start",
+    marginLeft: 10,
+    marginBottom: 10,
   },
+  paymentButton: {
+    backgroundColor: "#007bff",
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
+    marginBottom: 15,
+  },
+  paymentText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
+  selectedButton: { backgroundColor: "#0056b3" },
+  closeButton: {
+    padding: 10,
+    backgroundColor: "#ff4444",
+    alignItems: "center",
+    borderRadius: 5,
+    position: "absolute",
+    bottom: 20,
+    alignSelf: "center",
+    width: "90%",
+  },
+  closeButtonText: { color: "#fff", fontWeight: "bold" },
 });
 
 export default RideTrackingScreen;
