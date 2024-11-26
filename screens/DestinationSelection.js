@@ -194,7 +194,7 @@ const DestinationSelection = ({ route, navigation }) => {
         reservationData
       );
       const reservationID = response.data._id;
-      console.log(reservationID);
+      console.log(`reservation ID: ${reservationID}`);
       const amount = parseFloat(selectedVehicle.price.replace(" $CA", ""));
 
       // Redirige a la pantalla de opciones de pago

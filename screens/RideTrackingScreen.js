@@ -1,51 +1,63 @@
-// screens/RideTrackingScreen.js
-import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, Image } from "react-native";
+import React, { useEffect } from "react";
+import { StyleSheet, View, Text } from "react-native";
 import MapView, { Marker } from "react-native-maps";
-import carIcon from "../public/assets/car-icon.png"; // Asegúrate de tener un icono de coche en esta ruta
+import MapViewDirections from "react-native-maps-directions";
 
-const RideTrackingScreen = () => {
-  const [driverLocation, setDriverLocation] = useState({
-    latitude: 37.78825,
-    longitude: -122.4324,
-  });
-
-  const passengerLocation = {
-    latitude: 45.5017,
-    longitude: -73.5673,
+const MapDirections = ({ location }) => {
+  const fetchLastDocument = async () => {
+    try {
+      const response = await axios.get(API_URL);
+      return response.data;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        throw new Error(
+          error.response?.data?.detail || "Failed to fetch document"
+        );
+      }
+      throw error;
+    }
   };
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // Simulación de movimiento del conductor
-      setDriverLocation((prevLocation) => ({
-        latitude: prevLocation.latitude + 0.0001,
-        longitude: prevLocation.longitude + 0.0001,
-      }));
-    }, 1000); // Actualiza la posición cada segundo
+  const infoDriver = fetchLastDocument();
+  origin = infoDriver.origin;
 
-    return () => clearInterval(interval); // Limpia el intervalo al desmontar
-  }, []);
+  useEffect(() => {
+    if (location) {
+      console.log("Location updated:", location);
+    }
+  }, [location]);
+
+  if (!location || !location.origin || !location.destination) {
+    return (
+      <View style={styles.container}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
       <MapView
         style={styles.map}
         initialRegion={{
-          latitude: driverLocation.latitude,
-          longitude: driverLocation.longitude,
-          latitudeDelta: 0.1,
-          longitudeDelta: 0.1,
+          latitude: 45.5018869,
+          longitude: -73.56739189999999,
+          latitudeDelta: 0.008,
+          longitudeDelta: 0.003,
         }}
       >
-        <Marker coordinate={driverLocation}>
-          <Image source={carIcon} style={styles.carIcon} />
-        </Marker>
-        <Marker coordinate={passengerLocation} pinColor="blue" />
+        <MapViewDirections
+          origin={location.origin}
+          destination={location.destination}
+          apikey="AIzaSyCzlmUr9hg0E2elKzaHqr9eV-UuX4jOlBI"
+          strokeWidth={4}
+          strokeColor="#35c3f5"
+          mode={"DRIVING"}
+        />
+
+        <Marker coordinate={location.origin} title="Starting Point" />
+        <Marker coordinate={location.destination} title="Destination Point" />
       </MapView>
-      <View style={styles.infoContainer}>
-        <Text style={styles.infoText}>Conductor en camino...</Text>
-      </View>
     </View>
   );
 };
@@ -57,22 +69,6 @@ const styles = StyleSheet.create({
   map: {
     flex: 1,
   },
-  carIcon: {
-    width: 30,
-    height: 30,
-  },
-  infoContainer: {
-    position: "absolute",
-    bottom: 20,
-    left: 20,
-    backgroundColor: "white",
-    padding: 10,
-    borderRadius: 5,
-  },
-  infoText: {
-    fontSize: 16,
-    fontWeight: "bold",
-  },
 });
 
-export default RideTrackingScreen;
+export default MapDirections;
