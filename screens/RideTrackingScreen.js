@@ -1,124 +1,78 @@
+// screens/RideTrackingScreen.js
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, Image } from "react-native";
 import MapView, { Marker } from "react-native-maps";
+import carIcon from "../public/assets/car-icon.png"; // Asegúrate de tener un icono de coche en esta ruta
 
-const RideTrackingScreen = ({ route }) => {
-  const { userLocation, driverLocation } = route.params; // Recibe las ubicaciones desde la navegación
-
-  const [location, setLocation] = useState({
-    user: userLocation,
-    driver: driverLocation,
+const RideTrackingScreen = () => {
+  const [driverLocation, setDriverLocation] = useState({
+    latitude: 37.78825,
+    longitude: -122.4324,
   });
 
+  const passengerLocation = {
+    latitude: 45.5017,
+    longitude: -73.5673,
+  };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      // Simulación de movimiento del conductor
+      setDriverLocation((prevLocation) => ({
+        latitude: prevLocation.latitude + 0.0001,
+        longitude: prevLocation.longitude + 0.0001,
+      }));
+    }, 1000); // Actualiza la posición cada segundo
+
+    return () => clearInterval(interval); // Limpia el intervalo al desmontar
+  }, []);
+
   return (
-    <ScrollView contentContainerStyle={styles.scrollContainer}>
-      <View style={styles.container}>
-        <View style={styles.headerContainer}>
-          <Image
-            source={require("../public/assets/logoFastVoiture.png")}
-            style={styles.logo}
-          />
-          <Text style={styles.title}>Paiement</Text>
-        </View>
-        <Text style={styles.label}>Sélectionnez un mode de paiement:</Text>
-
-        <TouchableOpacity
-          style={[
-            styles.paymentButton,
-            selectedPaymentMethod === "cash" && styles.selectedButton,
-          ]}
-          onPress={() => {
-            setSelectedPaymentMethod("cash");
-            handleCashPayment();
-          }}
-        >
-          <Text style={styles.paymentText}>Espèces</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[
-            styles.paymentButton,
-            selectedPaymentMethod === "paypal" && styles.selectedButton,
-          ]}
-          onPress={handlePayPalPayment}
-        >
-          <Text style={styles.paymentText}>PayPal</Text>
-        </TouchableOpacity>
-
-        {showWebView && (
-          <Modal visible={showWebView} transparent animationType="slide">
-            <WebView
-              source={{ uri: paypalUrl }}
-              onNavigationStateChange={(navState) => {
-                if (navState.url.includes("/paypal/success")) {
-                  setShowWebView(false);
-                  capturePayPalOrder(); // Captura la orden
-                } else if (navState.url.includes("/paypal/cancel")) {
-                  setShowWebView(false);
-                  Alert.alert(
-                    "Paiement annulé",
-                    "L'utilisateur a annulé le paiement."
-                  );
-                }
-              }}
-              onError={() => {
-                setShowWebView(false);
-                Alert.alert(
-                  "Erreur",
-                  "Il y a eu un problème avec le paiement."
-                );
-              }}
-            />
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => setShowWebView(false)}
-            >
-              <Text style={styles.closeButtonText}>Fermer</Text>
-            </TouchableOpacity>
-          </Modal>
-        )}
+    <View style={styles.container}>
+      <MapView
+        style={styles.map}
+        initialRegion={{
+          latitude: driverLocation.latitude,
+          longitude: driverLocation.longitude,
+          latitudeDelta: 0.1,
+          longitudeDelta: 0.1,
+        }}
+      >
+        <Marker coordinate={driverLocation}>
+          <Image source={carIcon} style={styles.carIcon} />
+        </Marker>
+        <Marker coordinate={passengerLocation} pinColor="blue" />
+      </MapView>
+      <View style={styles.infoContainer}>
+        <Text style={styles.infoText}>Conductor en camino...</Text>
       </View>
-    </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  scrollContainer: { flexGrow: 1 },
-  container: { flex: 1, padding: 16, backgroundColor: "#fff" },
-  headerContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 20,
+  container: {
+    flex: 1,
   },
-  logo: { width: 75, height: 75, marginRight: 10 },
-  title: { fontSize: 24, fontWeight: "bold", textAlign: "center" },
-  label: {
-    fontSize: 18,
-    alignSelf: "flex-start",
-    marginLeft: 10,
-    marginBottom: 10,
+  map: {
+    flex: 1,
   },
-  paymentButton: {
-    backgroundColor: "#007bff",
-    padding: 15,
-    borderRadius: 10,
-    alignItems: "center",
-    marginBottom: 15,
+  carIcon: {
+    width: 30,
+    height: 30,
   },
-  paymentText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
-  selectedButton: { backgroundColor: "#0056b3" },
-  closeButton: {
-    padding: 10,
-    backgroundColor: "#ff4444",
-    alignItems: "center",
-    borderRadius: 5,
+  infoContainer: {
     position: "absolute",
     bottom: 20,
-    alignSelf: "center",
-    width: "90%",
+    left: 20,
+    backgroundColor: "white",
+    padding: 10,
+    borderRadius: 5,
   },
-  closeButtonText: { color: "#fff", fontWeight: "bold" },
+  infoText: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
 });
 
 export default RideTrackingScreen;

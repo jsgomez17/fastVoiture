@@ -71,6 +71,29 @@ const LoginScreen = ({ navigation }) => {
 
   // Función para manejar la autenticación biométrica (huella)
   const handleBiometricAuth = async (email) => {
+    // Verifica si el dispositivo soporta autenticación biométrica
+    const compatible = await LocalAuthentication.hasHardwareAsync();
+
+    if (!compatible) {
+      Alert.alert(
+        "Erreur",
+        "Ce dispositif ne supporte pas l'authentification biométrique."
+      );
+      return;
+    }
+
+    // Verifica si hay métodos de autenticación disponibles (huella y/o cara)
+    const enrolled = await LocalAuthentication.isEnrolledAsync();
+
+    if (!enrolled) {
+      Alert.alert(
+        "Erreur",
+        "Aucune méthode d'authentification biométrique n'est enregistrée."
+      );
+      return;
+    }
+
+    // Autenticación biométrica
     const biometricAuth = await LocalAuthentication.authenticateAsync({
       promptMessage: "Connectez-vous avec votre empreinte digitale",
       fallbackLabel: "Utiliser le mot de passe",

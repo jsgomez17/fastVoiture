@@ -10,7 +10,6 @@ import {
 } from "react-native";
 import LottieView from "lottie-react-native"; // Importa Lottie para la animación
 import { Ionicons } from "@expo/vector-icons";
-import { USERNAME } from "../config";
 
 const Reservation = ({ route, navigation }) => {
   console.log(route);

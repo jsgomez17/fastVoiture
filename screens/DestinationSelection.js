@@ -57,6 +57,7 @@ const DestinationSelection = ({ route, navigation }) => {
       username: "Christian",
       origin: departAddress,
       destination: destinationAddress,
+      prix: parseInt(selectedVehicle.price.replace(" $CA", "")), // Asegúrate de que el precio esté en formato numérico
     };
     console.log(data);
 

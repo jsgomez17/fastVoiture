@@ -65,7 +65,6 @@ export default function App() {
         <Stack.Screen
           name="RideTrackingScreen"
           component={RideTrackingScreen}
-          options={{ title: "Ride Tracking" }}
         />
       </Stack.Navigator>
     </NavigationContainer>
