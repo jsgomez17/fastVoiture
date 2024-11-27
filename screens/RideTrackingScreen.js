@@ -6,8 +6,9 @@ import MapViewDirections from "react-native-maps-directions";
 const MapDirections = ({ location }) => {
   const fetchLastDocument = async () => {
     try {
-      const response = await axios.get(API_URL);
-      return response.data;
+      const response = await axios.get(Api_URL_driver);
+
+      console.log(response);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         throw new Error(
